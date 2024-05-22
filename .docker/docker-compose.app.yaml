@@ -1,0 +1,17 @@
+services:
+  app:
+    image: mihaitatinta/http3-playground:0.0.1
+    ports:
+      - 443:8443
+      - 80:8080
+    environment:
+      - OLLAMA_HOST=ollama
+      - OLLAMA_PORT=11434
+      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
+      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_CERTIFICATE=file:///home/certs/fullchain.pem
+      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_PRIVATE_KEY=file:///home/certs/privkey.pem
+    volumes:
+      - ../www:/home/www
+      - ./certs:/home/certs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

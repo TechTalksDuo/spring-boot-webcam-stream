@@ -1,0 +1,21 @@
+services:
+  app:
+    extends:
+      file: .docker/docker-compose.app.yaml
+      service: app
+  prometheus:
+    extends:
+      file: .docker/docker-compose.metrics.yaml
+      service: prometheus
+  grafana:
+    extends:
+      file: .docker/docker-compose.metrics.yaml
+      service: grafana
+  ollama:
+    extends:
+      file: .docker/docker-compose.ollama.yaml
+      service: ollama
+  open-webui:
+    extends:
+      file: .docker/docker-compose.ollama.yaml
+      service: open-webui

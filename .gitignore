@@ -1,0 +1,6 @@
+**/*.pem
+
+.docker/grafana/data/**
+.docker/prometheus/data/**
+.docker/ollama/**
+.docker/open-webui/**
