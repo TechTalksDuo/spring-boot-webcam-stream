@@ -1,7 +1,5 @@
 version: "3.3"
-volumes:
-  prometheus_data: {}
-  grafana_data: {}
+
 services:
   prometheus:
     image: prom/prometheus
