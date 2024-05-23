@@ -5,6 +5,8 @@ services:
       - 443:8443
       - 80:8080
     environment:
+      # - SERVER_PORT=8080
+      # - SERVER_SSL_ENABLED=false
       - OLLAMA_HOST=ollama
       - OLLAMA_PORT=11434
       - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www

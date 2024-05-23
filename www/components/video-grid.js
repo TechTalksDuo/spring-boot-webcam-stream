@@ -211,7 +211,7 @@ class VideoGrid extends LitElement {
       snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
       const encodedData = snapshotCanvas.toDataURL("image/jpeg", this.#videoQuality);
       WebSocketState?.send(JSON.stringify({ videoStream: encodedData }));
-    }, 1000 / 1);
+    }, 1000 / 23.97);
   }
 }
 
