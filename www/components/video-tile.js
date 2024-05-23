@@ -57,6 +57,7 @@ class VideoTile extends LitElement {
       background-color: #17e;
       color: #fff;
       border-radius: 0 0.5rem 0 0;
+      z-index: 1;
     }
   `;
 

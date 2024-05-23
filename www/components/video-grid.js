@@ -142,8 +142,18 @@ class VideoGrid extends LitElement {
 
   #computeTileSize() {
     const items = this.shadowRoot.querySelectorAll("video, video-tile");
-    const optimumColumns = Math.ceil(Math.sqrt(items.length));
-    const optimumRows = Math.ceil(items.length / optimumColumns);
+    const isWider = this.clientWidth > this.clientHeight;
+    let optimumRows = 0,
+      optimumColumns = 0;
+
+    if (isWider) {
+      optimumColumns = Math.ceil(Math.sqrt(items.length));
+      optimumRows = Math.ceil(items.length / optimumColumns);
+    } else {
+      optimumRows = Math.ceil(Math.sqrt(items.length));
+      optimumColumns = Math.ceil(items.length / optimumRows);
+    }
+
     const optimumGridSize = optimumColumns * optimumRows;
 
     this.style.gridTemplateColumns = `repeat(${optimumColumns}, ${Math.ceil(
