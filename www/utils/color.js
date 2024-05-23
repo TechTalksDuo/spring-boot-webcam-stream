@@ -1,8 +1,3 @@
 export function getRandomColor() {
-  return (
-    "#" +
-    Math.floor(Math.random() * 2 ** 24)
-      .toString(16)
-      .padStart(6, "0")
-  );
+  return `hsla(${~~(360 * Math.random())}, 70%,  72%, 0.8)`;
 }
