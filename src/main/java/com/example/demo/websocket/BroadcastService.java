@@ -8,11 +8,14 @@ import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.*;
@@ -27,9 +30,13 @@ public class BroadcastService {
     private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
     private final List<WebSocketSession> allSessions = new CopyOnWriteArrayList<>();
     private final BackpressureSamplingService samplingService;
+    private final String prompt;
 
-    public BroadcastService(BackpressureSamplingService samplingService) {
+    public BroadcastService(BackpressureSamplingService samplingService,
+                            @Value("${ollama.prompt.file}") String promptPath) throws IOException {
         this.samplingService = samplingService;
+        this.prompt = Files.readString(Path.of(promptPath));
+        log.info("using prompt path: {}, content: {}", promptPath, prompt);
     }
 
     @Timed
@@ -70,18 +77,10 @@ public class BroadcastService {
         var id = (UUID) senderSession.getAttributes().get("id");
         samplingService.sample(id, () -> {
             String base64 = contribution.videoStream().substring(contribution.videoStream().lastIndexOf(",") + 1);
-            String answer = client.ask("From the following list: Happiness/Joy\n" +
-                            "Sadness\n" +
-                            "Anger\n" +
-                            "Fear\n" +
-                            "Surprise\n" +
-                            "Disgust\n" +
-                            "Contempt\n" +
-                            "Interest\n" +
-                            "Embarrassment\n" +
-                            "Confusion. Using only the given information, choose the right word that matches the person in the attached image. Reply only with the chosen word, no other explanation or text!",
+            String answer = client.ask(prompt,
                     base64);
 
+            log.info("Got answer: {}", answer);
             Messages.VideoFeedbackMessage update = new Messages.VideoFeedbackMessage(
                     (String) senderSession.getAttributes().get("username"),
                     answer

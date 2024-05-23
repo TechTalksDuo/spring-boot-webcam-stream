@@ -15,7 +15,7 @@ public class BackpressureSamplingService {
 
     private static final Logger log = getLogger(BackpressureSamplingService.class);
     static final int QUEUE_SIZE = 5;
-    static final int NUMBER_OF_THREADS = 2;
+    static final int NUMBER_OF_THREADS = 5;
     private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>(QUEUE_SIZE);
     private final Executor executor = new ThreadPoolExecutor(NUMBER_OF_THREADS, NUMBER_OF_THREADS, 0L, TimeUnit.MILLISECONDS, workQueue);
     //        private final Executor executor = Executors.newFixedThreadPool(5);
@@ -43,12 +43,13 @@ public class BackpressureSamplingService {
         } else {
             try {
                 executor.execute(() -> {
-                    log.trace("sample - starting user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
+                    log.info("sample - starting user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
                     try {
                         runnable.run();
-                        log.trace("sample - finished user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
+                        log.info("sample - finished user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
                         metrics.onFinishedRequest();
                     } catch (Exception e) {
+                        e.printStackTrace();
                         metrics.onError();
                     }
                 });

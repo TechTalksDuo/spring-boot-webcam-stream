@@ -18,6 +18,8 @@ import java.util.List;
 public class OllamaClient {
     @Value("${ollama.host}")
     String host;
+    @Value("${ollama.model}")
+    String model;
     @Value("${ollama.port}")
     Integer port;
     private RestTemplate restTemplate;
@@ -30,7 +32,7 @@ public class OllamaClient {
     @Timed
     public String ask(String prompt, String base64Image) {
         return restTemplate
-                .postForEntity("http://%s:%d/api/generate".formatted(host, port), new HttpEntity<>(new OllamaRequest("llava-phi3",
+                .postForEntity("http://%s:%d/api/generate".formatted(host, port), new HttpEntity<>(new OllamaRequest(model,
                         prompt,
                         false,
                         List.of(base64Image)
