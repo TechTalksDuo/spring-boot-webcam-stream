@@ -37,8 +37,9 @@ public class OllamaClient {
                         false,
                         List.of(base64Image)
 //                        new OllamaOptions(0, 1024)
-                )), String.class)
-                .getBody();
+                )), OllamaResponse.class)
+                .getBody()
+                .response();
 
     }
 
@@ -50,4 +51,5 @@ public class OllamaClient {
     record OllamaOptions(int temperature, int seed) {
 
     }
+    record OllamaResponse(String response){}
 }

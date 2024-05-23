@@ -10,9 +10,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,7 +37,7 @@ public class BroadcastService {
     public BroadcastService(BackpressureSamplingService samplingService,
                             @Value("${ollama.prompt.file}") String promptPath) throws IOException {
         this.samplingService = samplingService;
-        this.prompt = Files.readString(Path.of(promptPath));
+        this.prompt = Files.readString(ResourceUtils.getFile(promptPath).toPath());
         log.info("using prompt path: {}, content: {}", promptPath, prompt);
     }
 
