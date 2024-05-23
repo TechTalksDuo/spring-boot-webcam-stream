@@ -39,6 +39,6 @@ class OllamaClientTest {
                 "Interest\n" +
                 "Embarrassment\n" +
                 "Confusion. Using only the given information, choose the right word that matches the person in the attached image. Reply only with the chosen word, no other explanation or text!", picture);
-        assertEquals("aaa", answer);
+        assertEquals("Happiness/Joy", answer);
     }
 }
