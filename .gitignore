@@ -4,3 +4,4 @@
 .docker/prometheus/data/**
 .docker/ollama/**
 .docker/open-webui/**
+/target/
