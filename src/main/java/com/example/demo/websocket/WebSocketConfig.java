@@ -96,9 +96,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 session.getAttributes().put("username", principal);
                 session.getAttributes().put("id", UUID.randomUUID());
 
-                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(session);
+                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(decorator);
 
-                session.sendMessage(new TextMessage(toStringValue(
+                decorator.sendMessage(new TextMessage(toStringValue(
                         new Messages.UserConnectedMessage(principal, onlineUsers))));
 
             } catch (IOException e) {
