@@ -3,6 +3,8 @@ package com.example.demo.websocket;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
@@ -23,10 +25,13 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 @ConditionalOnProperty(name = "client.mode", matchIfMissing = true, havingValue = "false")
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
+    private static final Logger log = getLogger(WebSocketConfig.class);
 
     @Autowired
     ObjectMapper mapper;
@@ -54,7 +59,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         @Override
         public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
 // Handle incoming messages here
-//            TODO process async
+////            TODO process async
 //            executorService.submit(() -> {
 //
 //                String receivedMessage = (String) message.getPayload();
@@ -74,17 +79,18 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 Messages.ContributionMessage contribution = mapper.readValue(receivedMessage, Messages.ContributionMessage.class);
                 broadcastService.send(session, contribution);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                log.warn("can't process message", e);
             }
         }
         @Override
         public void afterConnectionEstablished(WebSocketSession session) {
 // Perform actions when a new WebSocket connection is established
             try {
-                session.setBinaryMessageSizeLimit(20 * 1024 * 1024);
-                session.setTextMessageSizeLimit(20 * 1024 * 1024);
+                session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
+                session.setTextMessageSizeLimit(2 * 1024 * 1024);
 //                TODO decorator session?
-//                ConcurrentWebSocketSessionDecorator decorator = new ConcurrentWebSocketSessionDecorator(session, 5_000, 2 * 1024 * 1024);
+                ConcurrentWebSocketSessionDecorator decorator = new ConcurrentWebSocketSessionDecorator(session, 500, 5 * 1024 * 1024,
+                        ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
                 Faker faker = new Faker();
                 String principal = faker.name().fullName();
                 session.getAttributes().put("username", principal);

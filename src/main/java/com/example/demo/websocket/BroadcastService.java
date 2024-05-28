@@ -31,8 +31,8 @@ public class BroadcastService {
     ObjectMapper mapper;
     @Autowired
     OllamaClient client;
-//    private final ExecutorService executorService = ForkJoinPool.commonPool();
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private final ExecutorService executorService = ForkJoinPool.commonPool();
+//    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 //    private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 //    private final ExecutorService executorService = Executors.newWorkStealingPool();
     private final List<WebSocketSession> allSessions = new CopyOnWriteArrayList<>();
@@ -131,8 +131,8 @@ public class BroadcastService {
 //        );
 //        return CompletableFuture.allOf();
 //        TODO try in parallel OOM killed after 10 rate with 10 instances
-        List<? extends Future<?>> all = allSessions.stream().map(session ->
-                senderSessionToSkip != null && senderSessionToSkip.equals(session) ? CompletableFuture.completedFuture(senderSessionToSkip) :
+        allSessions.forEach(session -> {
+                    if (senderSessionToSkip == null || !senderSessionToSkip.equals(session) ) {
                         executorService.submit(() -> {
                             try {
                                 session.sendMessage(message);
@@ -148,7 +148,9 @@ public class BroadcastService {
                                 unregisterSession(session);
                                 return session;
                             }
-                        })
+                        });
+                    }
+                });
 //                CompletableFuture.supplyAsync(() -> {
 //                            try {
 ////                                log.info("sendAll broadcast to: {}", session.getId());
@@ -166,7 +168,7 @@ public class BroadcastService {
 //                                return session;
 //                            }
 //                        }, executorService)
-        ).toList();
+//        ).toList();
         return CompletableFuture.allOf();
 //        return CompletableFuture.allOf(all.toArray(new CompletableFuture[]{}));// TODO OOM
     }
