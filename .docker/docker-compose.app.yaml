@@ -30,10 +30,10 @@ services:
       resources:
         limits:
           cpus: "4"
-          memory: 4G
+          memory: 1G
         reservations:
           cpus: "4"
-          memory: 4G
+          memory: 1G
 #ssh -R spring-stream.example:443:localhost:80 v2@connect.ngrok-agent.com http
   client:
     image: "amazoncorretto:21.0.3-al2023-headless"

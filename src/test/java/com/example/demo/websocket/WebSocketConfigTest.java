@@ -19,7 +19,13 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "client.mode=true")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+        "client.mode=true",
+        "websocket.input.dir=file://${PWD}/src/test/resources/input_small",
+                "websocket.rateMillis=1000",
+                "websocket.target.port=${server.port}",
+        })
 class WebSocketConfigTest {
 
     @LocalServerPort

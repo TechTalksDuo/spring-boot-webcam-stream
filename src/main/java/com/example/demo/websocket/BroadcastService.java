@@ -118,39 +118,42 @@ public class BroadcastService {
     }
     private CompletableFuture sendAll(TextMessage message, WebSocketSession senderSessionToSkip) {
 //        TODO send sequentially
-//        allSessions.forEach(session -> {
-//                    try {
-//                        if ( senderSessionToSkip == null || !senderSessionToSkip.equals(session)) {
-//                            session.sendMessage(message);
-//                        }
-//                    } catch (IOException e) {
-//                        log.warn("send - error", e);
-//                        // TODO remove session from list
-//                    }
-//                }
-//        );
-//        return CompletableFuture.allOf();
-//        TODO try in parallel OOM killed after 10 rate with 10 instances
         allSessions.forEach(session -> {
-                    if (senderSessionToSkip == null || !senderSessionToSkip.equals(session) ) {
-                        executorService.submit(() -> {
-                            try {
+                    try {
+                        if ( senderSessionToSkip == null || !senderSessionToSkip.equals(session)) {
+                            if (session.isOpen())
                                 session.sendMessage(message);
-                                return session;
-                            } catch (IOException e) {
-                                log.warn("send - error", e);
-                                // TODO remove session from list
-                                try {
-                                    session.close(CloseStatus.SERVER_ERROR);
-                                } catch (IOException ex) {
-                                    log.warn("can't close session: {}", session, ex);
-                                }
+                            else
                                 unregisterSession(session);
-                                return session;
-                            }
-                        });
+                        }
+                    } catch (IOException e) {
+                        log.warn("send - error", e);
+                        // TODO remove session from list
                     }
-                });
+                }
+        );
+        return CompletableFuture.allOf();
+//        TODO try in parallel OOM killed after 10 rate with 10 instances
+//        allSessions.forEach(session -> {
+//                    if (senderSessionToSkip == null || !senderSessionToSkip.equals(session) ) {
+//                        executorService.submit(() -> {
+//                            try {
+//                                session.sendMessage(message);
+//                                return session;
+//                            } catch (IOException e) {
+//                                log.warn("send - error", e);
+//                                // TODO remove session from list
+//                                try {
+//                                    session.close(CloseStatus.SERVER_ERROR);
+//                                } catch (IOException ex) {
+//                                    log.warn("can't close session: {}", session, ex);
+//                                }
+//                                unregisterSession(session);
+//                                return session;
+//                            }
+//                        });
+//                    }
+//                });
 //                CompletableFuture.supplyAsync(() -> {
 //                            try {
 ////                                log.info("sendAll broadcast to: {}", session.getId());
@@ -169,7 +172,7 @@ public class BroadcastService {
 //                            }
 //                        }, executorService)
 //        ).toList();
-        return CompletableFuture.allOf();
+//        return CompletableFuture.allOf();
 //        return CompletableFuture.allOf(all.toArray(new CompletableFuture[]{}));// TODO OOM
     }
 
