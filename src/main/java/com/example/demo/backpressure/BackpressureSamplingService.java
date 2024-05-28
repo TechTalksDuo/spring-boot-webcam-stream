@@ -38,7 +38,7 @@ public class BackpressureSamplingService {
         boolean waitUntilExpirationTime = firstTimeSampleFromUser ? shouldTriggerProcessing : expirationTime.isAfter(now);
 
         if (waitUntilExpirationTime) {
-            log.trace("sample - skip user {} until expirationTime: {}", id, expirationTime);
+            log.debug("sample - skip user {} until expirationTime: {}", id, expirationTime);
             metrics.onDroppedRequest();
         } else {
             try {
@@ -55,7 +55,7 @@ public class BackpressureSamplingService {
                 });
             } catch (RejectedExecutionException e) {
                 metrics.onRejectedRequest();
-                log.trace("sample - skip user {} due to limit reached: {}/{}", id, workQueue.size(), QUEUE_SIZE);
+                log.debug("sample - skip user {} due to limit reached: {}/{}", id, workQueue.size(), QUEUE_SIZE);
             }
         }
 

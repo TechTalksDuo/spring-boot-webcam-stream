@@ -69,6 +69,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <arguments>--platform: linux/arm64</arguments>
+                </configuration>
             </plugin>
         </plugins>
     </build>

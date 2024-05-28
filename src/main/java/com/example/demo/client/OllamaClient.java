@@ -22,7 +22,7 @@ public class OllamaClient {
     String model;
     @Value("${ollama.port}")
     Integer port;
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     public OllamaClient() {
         this.restTemplate = new RestTemplate();

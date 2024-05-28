@@ -1,23 +1,57 @@
 services:
   app:
     container_name: app
-    image: mihaitatinta/http3-playground:0.0.1
+    image: "amazoncorretto:21.0.3-al2023-headless"
+    platform: linux/arm64
     ports:
-      - 443:8443
+#      - 443:8443
       - 80:8080
+    command: bash -c "java -XX:MinRAMPercentage=50.0 -XX:MaxRAMPercentage=90.0 -XshowSettings:vm -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/home/jfr/heap_dump.hprof -XX:StartFlightRecording=delay=10s,maxsize=1g,disk=true,dumponexit=true,filename=/home/jfr/latest.jfr -jar /home/app/demo-0.0.1-SNAPSHOT.jar --websocket.input.dir=/home/input --websocket.target.port=8080 --websocket.target.host=app"
     environment:
       - DEBUG=false
       - SERVER_PORT=8080
       - SERVER_SSL_ENABLED=false
+      - OLLAMA_ENABLED=false
       - OLLAMA_HOST=ollama
       - OLLAMA_PORT=11434
-      - OLLAMA_MODEL=llava-phi3
+      - OLLAMA_MODEL=phi3
       - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
       - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
-      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_CERTIFICATE=file:///home/certs/fullchain.pem
-      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_PRIVATE_KEY=file:///home/certs/privkey.pem
+#      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_CERTIFICATE=file:///home/certs/fullchain.pem
+#      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_PRIVATE_KEY=file:///home/certs/privkey.pem
     volumes:
       - ../www:/home/www
+      - ../target:/home/app
+      - ../target:/home/jfr
       - ./certs:/home/certs
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 4G
+        reservations:
+          cpus: "4"
+          memory: 4G
+#ssh -R spring-stream.example:443:localhost:80 v2@connect.ngrok-agent.com http
+  client:
+    image: "amazoncorretto:21.0.3-al2023-headless"
+    platform: linux/arm64
+    environment:
+      - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
+      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
+      - CLIENT_MODE=true
+    volumes:
+      - ../target:/home/app
+      - ../www:/home/www
+      - ../src/test/resources/input_small:/home/input
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input --websocket.rateMillis=10 --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    deploy:
+      replicas: 7
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+#java -jar target/demo-0.0.1-SNAPSHOT.jar --client.mode=true --websocket.input.dir=file://${PWD}/src/test/resources/input --websocket.target.port=80
+#--server.port=0 --management.server.port=0 --websocket.rateMillis=100 --websocket.target.host=localhost

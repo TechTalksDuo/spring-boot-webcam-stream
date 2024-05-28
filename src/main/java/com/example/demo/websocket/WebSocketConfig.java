@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
+import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
@@ -18,7 +20,10 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+@ConditionalOnProperty(name = "client.mode", matchIfMissing = true, havingValue = "false")
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
@@ -27,6 +32,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     ObjectMapper mapper;
     @Autowired
     BroadcastService broadcastService;
+    private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -48,6 +54,20 @@ public class WebSocketConfig implements WebSocketConfigurer {
         @Override
         public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
 // Handle incoming messages here
+//            TODO process async
+//            executorService.submit(() -> {
+//
+//                String receivedMessage = (String) message.getPayload();
+//// Process the message and send a response if needed`
+//                try {
+//                    Messages.ContributionMessage contribution = mapper.readValue(receivedMessage, Messages.ContributionMessage.class);
+//                    broadcastService.send(session, contribution)
+//                            .join();
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            });
+//
             String receivedMessage = (String) message.getPayload();
 // Process the message and send a response if needed`
             try {
@@ -63,6 +83,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
             try {
                 session.setBinaryMessageSizeLimit(20 * 1024 * 1024);
                 session.setTextMessageSizeLimit(20 * 1024 * 1024);
+//                TODO decorator session?
+//                ConcurrentWebSocketSessionDecorator decorator = new ConcurrentWebSocketSessionDecorator(session, 5_000, 2 * 1024 * 1024);
                 Faker faker = new Faker();
                 String principal = faker.name().fullName();
                 session.getAttributes().put("username", principal);
