@@ -120,7 +120,7 @@ public class BroadcastService {
 //        TODO send sequentially
         allSessions.forEach(session -> {
                     try {
-                        if ( senderSessionToSkip == null || !senderSessionToSkip.equals(session)) {
+                        if ( senderSessionToSkip == null || !senderSessionToSkip.getId().equals(session.getId())) {
                             if (session.isOpen())
                                 session.sendMessage(message);
                             else

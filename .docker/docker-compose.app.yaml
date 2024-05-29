@@ -46,7 +46,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/input_80:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input --websocket.rateMillis=30 --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input --websocket.rateMillis=80 --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
     deploy:
       replicas: 10
       resources:
