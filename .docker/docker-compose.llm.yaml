@@ -1,0 +1,8 @@
+services:
+  face-emotion-api:
+    container_name: face-emotion-api
+    build: ./local-llm
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./local-llm/.cache:/.cache

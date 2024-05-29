@@ -4,4 +4,7 @@
 .docker/prometheus/data/**
 .docker/ollama/**
 .docker/open-webui/**
+
+.cache
+__pycache__
 /target/
