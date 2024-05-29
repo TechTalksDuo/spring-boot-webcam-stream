@@ -45,10 +45,10 @@ services:
     volumes:
       - ../target:/home/app
       - ../www:/home/www
-      - ../src/test/resources/input_small:/home/input
+      - ../src/test/resources/videos:/home/input
     command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input --websocket.rateMillis=80 --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
     deploy:
-      replicas: 5
+      replicas: 7
       resources:
         limits:
           cpus: "1"

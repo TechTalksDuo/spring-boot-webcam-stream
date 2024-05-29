@@ -3,7 +3,6 @@ package com.example.demo;
 
 import com.example.demo.websocket.ExistOnCloseWebSocketHandler;
 import com.example.demo.websocket.Messages;
-import com.example.demo.websocket.SampleWebSocketHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,20 +17,22 @@ import org.springframework.web.socket.client.WebSocketClient;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.IntStream;
 
 @ConditionalOnProperty(name = "client.mode", havingValue = "true")
 @Component
 public class WebSocketSampleClient implements CommandLineRunner {
     private final WebSocketClient client;
-    private final String[] availableImages;
+    private final List<String> availableImages;
+    private int currentIndex;
     private final int rateMillis;
     private final int port;
     private final String host;
@@ -39,7 +40,7 @@ public class WebSocketSampleClient implements CommandLineRunner {
     private final ScheduledExecutorService scheduledService = Executors.newSingleThreadScheduledExecutor();
     private final AtomicReference<ScheduledFuture<?>> scheduledFuture = new AtomicReference<>();
 
-    public WebSocketSampleClient(WebSocketClient client, File[] availableImages,
+    public WebSocketSampleClient(WebSocketClient client, List<File> availableImages,
                                  @Value("${websocket.rateMillis}") int rateMillis,
                                  @Value("${websocket.target.port}") int port,
                                  @Value("${websocket.target.host:localhost}") String host, ObjectMapper mapper
@@ -49,20 +50,23 @@ public class WebSocketSampleClient implements CommandLineRunner {
         this.port = port;
         this.host = host;
         this.mapper = mapper;
-        int LOOP_SIZE = 10;
 
-        this.availableImages = new String[LOOP_SIZE];
-        IntStream.range(0, LOOP_SIZE)
-                .forEach(i -> {
-
-                    var random = ThreadLocalRandom.current().nextInt(availableImages.length);
+        var random = ThreadLocalRandom.current().nextInt(availableImages.size());
+        File[] frames = availableImages.get(random)
+                .listFiles();
+        this.availableImages = Arrays.stream(frames)
+//                .sorted()
+                .map(frame -> {
                     try {
-                        this.availableImages[i] = "data:image/jpeg;base64," +
-                                Base64.getEncoder().encodeToString(Files.readAllBytes(availableImages[random].toPath()));
+                        return "data:image/jpeg;base64," +
+                                Base64.getEncoder().encodeToString(Files.readAllBytes(frame.toPath()));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                });
+                })
+                .toList();
+        currentIndex = 0;
+
     }
 
     @Override
@@ -107,8 +111,7 @@ public class WebSocketSampleClient implements CommandLineRunner {
     }
 
     private String getImage() throws IOException {
-        var random = ThreadLocalRandom.current().nextInt(availableImages.length);
-        return availableImages[random];
+        return availableImages.get(currentIndex++ % availableImages.size());
     }
 
     byte[] toStringValue(Object payload) {

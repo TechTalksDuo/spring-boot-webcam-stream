@@ -23,7 +23,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -43,9 +45,10 @@ public class ClientModeConfig {
     ObjectMapper mapper;
 
     @Bean
-    File[] availableImages(@Value("${websocket.input.dir}") String inputDir) throws FileNotFoundException {
-
-        return ResourceUtils.getFile(inputDir).listFiles();
+    List<File> availableImages(@Value("${websocket.input.dir}") String inputDir) throws FileNotFoundException {
+        return Arrays.stream(ResourceUtils.getFile(inputDir).listFiles())
+                .filter(File :: isDirectory)
+                .toList();
 
     }
 

@@ -47,6 +47,17 @@ class ApiClientTest {
 
     }
 
+    @Test
+    void testResizePpm() throws IOException {
+        File[] files = Path.of("target/test-classes/videos/frames").toFile().listFiles();
+        for(File f : List.of(files)){
+            resize(f.getAbsolutePath(), Path.of("target/test-classes/videos/frames")
+                    .resolve(f.getName() + "_resized.png").toFile().getAbsolutePath(), 80, 80);
+        }
+
+
+    }
+
     public void resize(String inputImagePath,
                        String outputImagePath, int scaledWidth, int scaledHeight)
             throws IOException {
