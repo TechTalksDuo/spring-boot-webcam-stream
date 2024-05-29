@@ -32,8 +32,8 @@ public class BroadcastService {
     @Autowired
     OllamaClient client;
 //    private final ExecutorService executorService = ForkJoinPool.commonPool();
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
-//    private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+//    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 //    private final ExecutorService executorService = Executors.newWorkStealingPool();
     private final List<WebSocketSession> allSessions = new CopyOnWriteArrayList<>();
     private final BackpressureSamplingService samplingService;
@@ -132,7 +132,7 @@ public class BroadcastService {
                     }
                 }
         );
-        return CompletableFuture.allOf();
+        return CompletableFuture.completedFuture(null);
 //        TODO try in parallel OOM killed after 10 rate with 10 instances
 //        allSessions.forEach(session -> {
 //                    if (senderSessionToSkip == null || !senderSessionToSkip.equals(session) ) {
@@ -154,6 +154,7 @@ public class BroadcastService {
 //                        });
 //                    }
 //                });
+//        return CompletableFuture.completedFuture(null);
 //                CompletableFuture.supplyAsync(() -> {
 //                            try {
 ////                                log.info("sendAll broadcast to: {}", session.getId());

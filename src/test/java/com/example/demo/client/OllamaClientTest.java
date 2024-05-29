@@ -28,7 +28,7 @@ class OllamaClientTest {
     @Test
     void test() throws IOException {
         String picture = Base64.getEncoder()
-                .encodeToString(Files.readAllBytes(ResourceUtils.getFile("classpath:input/img.png").toPath()));
+                .encodeToString(Files.readAllBytes(ResourceUtils.getFile("classpath:input/img_6.png").toPath()));
         String answer = client.ask("From the following list: Happiness/Joy\n" +
                 "Sadness\n" +
                 "Anger\n" +

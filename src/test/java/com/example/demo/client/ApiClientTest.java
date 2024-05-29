@@ -40,7 +40,8 @@ class ApiClientTest {
     void testResize() throws IOException {
         File[] files = Path.of("target/test-classes/input/").toFile().listFiles();
         for(File f : List.of(files)){
-            resize(f.getAbsolutePath(), f.getAbsolutePath() + "_resized.png", 200, 200);
+            resize(f.getAbsolutePath(), Path.of("target/test-classes/input_80/")
+                    .resolve(f.getName() + "_resized.png").toFile().getAbsolutePath(), 80, 80);
         }
 
 
@@ -53,6 +54,8 @@ class ApiClientTest {
         File inputFile = new File(inputImagePath);
         BufferedImage inputImage = ImageIO.read(inputFile);
 
+        if (inputImage == null)
+            return;
         // creates output image
         BufferedImage outputImage = new BufferedImage(scaledWidth,
                 scaledHeight, inputImage.getType());
