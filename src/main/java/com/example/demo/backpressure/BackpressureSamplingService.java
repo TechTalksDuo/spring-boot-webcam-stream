@@ -42,6 +42,7 @@ public class BackpressureSamplingService {
             metrics.onDroppedRequest();
         } else {
             try {
+                metrics.onSubmit();
                 executor.execute(() -> {
                     log.info("sample - starting user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
                     try {
@@ -53,7 +54,7 @@ public class BackpressureSamplingService {
                         metrics.onError();
                     }
                 });
-            } catch (RejectedExecutionException e) {
+            } catch (Exception e) {
                 metrics.onRejectedRequest();
                 log.debug("sample - skip user {} due to limit reached: {}/{}", id, workQueue.size(), QUEUE_SIZE);
             }

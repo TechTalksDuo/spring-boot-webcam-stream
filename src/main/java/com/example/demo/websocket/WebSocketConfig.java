@@ -37,7 +37,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
     ObjectMapper mapper;
     @Autowired
     BroadcastService broadcastService;
-    private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+    @Autowired
+    WebSocketMetrics metrics;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -58,6 +59,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         }
         @Override
         public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
+            metrics.onMessage();
 // Handle incoming messages here
 ////            TODO process async
 //            executorService.submit(() -> {
@@ -84,6 +86,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         }
         @Override
         public void afterConnectionEstablished(WebSocketSession session) {
+            metrics.onNewSession();
 // Perform actions when a new WebSocket connection is established
             try {
                 session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
@@ -112,6 +115,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         @Override
         public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+            metrics.onClosedSession();
             broadcastService.unregisterSession(session);
 // Perform actions when a WebSocket connection is closed
         }
