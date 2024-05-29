@@ -1,0 +1,7 @@
+fastapi~=0.111.0
+langchain_huggingface~=0.0.1
+pydantic~=2.7.2
+torch~=2.3.0
+torchvision~=0.18.0
+transformers~=4.41.1
+uvicorn~=0.30.0
