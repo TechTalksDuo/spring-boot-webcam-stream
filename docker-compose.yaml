@@ -3,6 +3,10 @@ services:
     extends:
       file: .docker/docker-compose.app.yaml
       service: app
+  client:
+    extends:
+      file: .docker/docker-compose.app.yaml
+      service: client
   prometheus:
     extends:
       file: .docker/docker-compose.metrics.yaml
@@ -13,11 +17,11 @@ services:
       service: grafana
   # ollama:
   #   extends:
-  #     file: .docker/docker-compose.ollama.yaml
+  #     file: .docker/docker-compose.ollama.mac.yaml
   #     service: ollama
   # open-webui:
   #   extends:
-  #     file: .docker/docker-compose.ollama.yaml
+  #     file: .docker/docker-compose.ollama.mac.yaml
   #     service: open-webui
   face-emotion-api:
     extends:

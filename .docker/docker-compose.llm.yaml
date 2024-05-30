@@ -1,8 +1,15 @@
 services:
   face-emotion-api:
     container_name: face-emotion-api
+    platform: linux/amd64
     build: ./local-llm
     ports:
       - "8000:8000"
     volumes:
       - ./local-llm/.cache:/.cache
+
+    deploy:
+      resources:
+        limits:
+          cpus: "6"
+          memory: 5G

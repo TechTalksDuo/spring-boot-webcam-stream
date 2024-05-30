@@ -20,7 +20,7 @@ class WebSocketEventTarget extends EventTarget {
   open() {
     if (this.readyState !== 3) return;
 
-    this.#websocket = new WebSocket(`wss://${window.location.host}/websocket`);
+    this.#websocket = new WebSocket(`ws://${window.location.host}/websocket`);
     console.info("WebSocket opening...");
     this.#websocket.onopen = () => {
       console.info("WebSocket opened");
