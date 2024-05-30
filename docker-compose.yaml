@@ -11,14 +11,14 @@ services:
     extends:
       file: .docker/docker-compose.metrics.yaml
       service: grafana
-  ollama:
-    extends:
-      file: .docker/docker-compose.ollama.yaml
-      service: ollama
-  open-webui:
-    extends:
-      file: .docker/docker-compose.ollama.yaml
-      service: open-webui
+  # ollama:
+  #   extends:
+  #     file: .docker/docker-compose.ollama.yaml
+  #     service: ollama
+  # open-webui:
+  #   extends:
+  #     file: .docker/docker-compose.ollama.yaml
+  #     service: open-webui
   face-emotion-api:
     extends:
       file: .docker/docker-compose.llm.yaml
