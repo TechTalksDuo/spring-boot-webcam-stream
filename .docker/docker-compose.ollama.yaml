@@ -7,6 +7,7 @@ services:
     volumes:
       - ./ollama:/root/.ollama
     container_name: ollama
+    platform: ${DOCKER_PLATFORM}
     pull_policy: always
     tty: true
     restart: unless-stopped
@@ -31,6 +32,7 @@ services:
       dockerfile: Dockerfile
     image: ghcr.io/open-webui/open-webui:cuda
     container_name: open-webui
+    platform: ${DOCKER_PLATFORM}
     volumes:
       - ./open-webui:/app/backend/data
     depends_on:

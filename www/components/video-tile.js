@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "https://esm.run/lit/index.js";
 
+import "./video-feedback.js";
 import { getRandomColor } from "../utils/color.js";
 import { WebSocketState, WebSocketEvent, WebSocketEventType } from "../events/websocket.js";
 
@@ -29,35 +30,43 @@ class VideoTile extends LitElement {
     :host {
       background-color: var(--color, transparent);
       color: transparent;
-      display: grid;
-      grid-template-areas: "video";
+      position: relative;
     }
 
     img {
       object-fit: cover;
       width: 100%;
       height: 100%;
-      grid-area: video;
       color: #fff;
     }
 
+    video-feedback {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
     .no-image {
-      grid-area: video;
-      justify-self: center;
-      align-self: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       width: 50%;
       height: auto;
     }
 
     .username:not(:empty) {
-      grid-area: video;
-      justify-self: start;
-      align-self: end;
-      padding: 0.5rem 1rem;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      padding: clamp(0.25rem, 2.5vmin, 0.5rem) clamp(0.5rem, 2.5vmin, 1rem);
       background-color: #17e;
       color: #fff;
       border-radius: 0 0.5rem 0 0;
-      z-index: 1;
+      z-index: 100;
+      font-size: clamp(0.5rem, 5vmin, 1rem);
     }
   `;
 
@@ -72,6 +81,7 @@ class VideoTile extends LitElement {
       ${!this.isStreaming
         ? html`<img class="no-image" alt="No image" src="/assets/user.svg" />`
         : ""}
+      <video-feedback .username=${this.username}></video-feedback>
       <span class="username">${this.username}</span>
     `;
   }

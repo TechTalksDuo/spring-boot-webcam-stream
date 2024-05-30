@@ -2,9 +2,9 @@ services:
   app:
     container_name: app
     image: "amazoncorretto:21.0.3-al2023-headless"
-    platform: linux/arm64
+    platform: ${DOCKER_PLATFORM}
     ports:
-#      - 443:8443
+      # - 443:8443
       - 80:8080
     command: bash -c "java -XX:MinRAMPercentage=50.0 -XX:MaxRAMPercentage=90.0 -XshowSettings:vm -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/home/jfr/heap_dump.hprof -XX:StartFlightRecording=delay=10s,maxsize=1g,disk=true,dumponexit=true,filename=/home/jfr/latest.jfr -jar /home/app/demo-0.0.1-SNAPSHOT.jar --websocket.input.dir=/home/input --websocket.target.port=8080 --websocket.target.host=app"
     environment:
@@ -18,8 +18,8 @@ services:
       - OLLAMA_MODEL=phi3
       - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
       - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
-#      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_CERTIFICATE=file:///home/certs/fullchain.pem
-#      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_PRIVATE_KEY=file:///home/certs/privkey.pem
+    #      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_CERTIFICATE=file:///home/certs/fullchain.pem
+    #      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_PRIVATE_KEY=file:///home/certs/privkey.pem
     volumes:
       - ../www:/home/www
       - ../target:/home/app
@@ -35,10 +35,10 @@ services:
         reservations:
           cpus: "4"
           memory: 1G
-#ssh -R spring-stream.example:443:localhost:80 v2@connect.ngrok-agent.com http
+  #ssh -R spring-stream.example:443:localhost:80 v2@connect.ngrok-agent.com http
   client:
     image: "amazoncorretto:21.0.3-al2023-headless"
-    platform: linux/arm64
+    platform: ${DOCKER_PLATFORM}
     environment:
       - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
       - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
