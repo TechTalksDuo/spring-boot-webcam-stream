@@ -47,12 +47,12 @@ class VideoGrid extends LitElement {
         place-self: center;
 
         button {
-          padding: 1rem;
+          padding: clamp(0.5rem, 2.5vmin, 1rem);
           background-color: #17e;
           border-radius: 0.5rem;
           border: 0.25rem solid;
           color: #fff;
-          font-size: 1.5rem;
+          font-size: clamp(0.75rem, 7.5vmin, 1.5rem);
           display: inline-flex;
           gap: 0.5rem;
 
@@ -86,8 +86,8 @@ class VideoGrid extends LitElement {
     }
 
     .feather {
-      width: 1.5rem;
-      height: 1.5rem;
+      width: clamp(0.75rem, 7.5vmin, 1.5rem);
+      aspect-ratio: 1;
       stroke: currentColor;
       stroke-width: 2;
       stroke-linecap: round;
