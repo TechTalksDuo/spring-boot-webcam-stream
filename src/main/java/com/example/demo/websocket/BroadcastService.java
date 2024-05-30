@@ -1,6 +1,7 @@
 package com.example.demo.websocket;
 
 import com.example.demo.backpressure.BackpressureSamplingService;
+import com.example.demo.client.LLMClient;
 import com.example.demo.client.OllamaClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,8 +30,10 @@ public class BroadcastService {
     private static final Logger log = LoggerFactory.getLogger(BroadcastService.class);
     @Autowired
     ObjectMapper mapper;
+//    @Autowired
+//    OllamaClient client;
     @Autowired
-    OllamaClient client;
+    LLMClient client;
 //    private final ExecutorService executorService = ForkJoinPool.commonPool();
 //    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
     private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
@@ -89,8 +92,9 @@ public class BroadcastService {
         if (ollamaEnabled) {
             samplingService.sample(id, () -> {
                 String base64 = contribution.videoStream().substring(contribution.videoStream().lastIndexOf(",") + 1);
-                String answer = client.ask(prompt,
-                        base64);
+                var answer = client.ask(base64);
+//                String answer = client.ask(prompt,
+//                        base64);
 
                 log.info("Got answer: {}", answer);
                 Messages.VideoFeedbackMessage update = new Messages.VideoFeedbackMessage(
