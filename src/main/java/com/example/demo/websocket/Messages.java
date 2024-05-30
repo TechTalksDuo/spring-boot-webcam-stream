@@ -30,9 +30,9 @@ public interface Messages {
         }
     }
     record ContributionMessage(MessageType type, String videoStream){}
-    record VideoFeedbackMessage(MessageType type, String username, List<Emotion> emotions){
-        public VideoFeedbackMessage(String username, List<Emotion> emotions) {
-            this(MessageType.VIDEO_FEEDBACK, username, emotions);
+    record VideoFeedbackMessage(MessageType type, String username, Emotion emotion){
+        public VideoFeedbackMessage(String username, Emotion emotion) {
+            this(MessageType.VIDEO_FEEDBACK, username, emotion);
         }
     }
 

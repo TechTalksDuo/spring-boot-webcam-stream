@@ -63,18 +63,15 @@ public class LLMClient {
 
 
     @Timed
-    public List<Messages.Emotion> ask(String base64Image) {
+    public Messages.Emotion ask(String base64Image) {
         List<LLMResponse> body = restTemplate
                 .exchange("http://%s:%d/api/analyze".formatted(host, port),
                         HttpMethod.POST,
                         new HttpEntity<>(new LLMRequest(base64Image
                 )), new ParameterizedTypeReference<List<LLMResponse>>(){})
                 .getBody();
-
-        return body
-                .stream()
-                .map(item -> new Messages.Emotion(item.label, DICTIONARY.get(item.label), item.score))
-                .toList();
+        var item = body.get(0);
+        return new Messages.Emotion(item.label, DICTIONARY.get(item.label), item.score);
 
     }
 
