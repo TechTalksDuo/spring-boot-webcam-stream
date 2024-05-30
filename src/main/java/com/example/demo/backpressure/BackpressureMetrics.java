@@ -20,9 +20,12 @@ public class BackpressureMetrics {
     private final Counter rejectedCounter;
     private final Counter finishedCounter;
     private final Counter errorCounter;
+    private final Counter submitCounter;
 
     public BackpressureMetrics(MeterRegistry meterRegistry) {
         requestCounter = Counter.builder("long.running.task.request.count")
+                .register(meterRegistry);
+        submitCounter = Counter.builder("long.running.task.submit.count")
                 .register(meterRegistry);
         droppedCounter = Counter.builder("long.running.task.drop.count")
                 .register(meterRegistry);
@@ -36,6 +39,9 @@ public class BackpressureMetrics {
 
     void onRequest() {
         requestCounter.increment();
+    }
+    void onSubmit() {
+        submitCounter.increment();
     }
 
     void onRejectedRequest() {

@@ -1,8 +1,9 @@
 package com.example.demo.websocket;
 
+
 import java.util.List;
 
-public class Messages {
+public interface Messages {
 
     record UserConnectedMessage(MessageType type, String me, List<OnlineUser> onlineUsers) {
         public UserConnectedMessage(String me, List<OnlineUser> onlineUsers) {
@@ -29,9 +30,9 @@ public class Messages {
         }
     }
     record ContributionMessage(MessageType type, String videoStream){}
-    record VideoFeedbackMessage(MessageType type, String username, String description){
-        public VideoFeedbackMessage(String username, String description) {
-            this(MessageType.VIDEO_FEEDBACK, username, description);
+    record VideoFeedbackMessage(MessageType type, String username, Emotion emotion){
+        public VideoFeedbackMessage(String username, Emotion emotion) {
+            this(MessageType.VIDEO_FEEDBACK, username, emotion);
         }
     }
 
@@ -43,5 +44,8 @@ public class Messages {
         VIDEO_FEEDBACK,
         USER_LEFT,
 
+    }
+
+    record Emotion(String label, String emoji, double score) {
     }
 }
