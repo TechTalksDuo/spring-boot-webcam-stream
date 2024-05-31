@@ -4,18 +4,18 @@ services:
     image: "amazoncorretto:21.0.3-al2023-headless"
     platform: ${DOCKER_PLATFORM}
     ports:
-      - 8443:8443
+      - 443:8443
       - 80:8080
     command: bash -c "java -XX:MinRAMPercentage=50.0 -XX:MaxRAMPercentage=90.0 -XshowSettings:vm -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/home/jfr/heap_dump.hprof -XX:StartFlightRecording=delay=10s,maxsize=1g,disk=true,dumponexit=true,filename=/home/jfr/latest.jfr -jar /home/app/demo-0.0.1-SNAPSHOT.jar --websocket.input.dir=/home/input --websocket.target.port=8080 --websocket.target.host=app"
     environment:
       - DEBUG=false
-      - SERVER_PORT=8080
-      - SERVER_SSL_ENABLED=false
-#      - SERVER_PORT=8443
-#      - SERVER_SSL_ENABLED=true
-#      - SERVER_SSL_BUNDLE=server
-#      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_CERTIFICATE=file:///home/certs/fullchain.pem
-#      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_PRIVATE_KEY=file:///home/certs/privkey.pem
+      # - SERVER_PORT=8080
+      # - SERVER_SSL_ENABLED=false
+      - SERVER_PORT=8443
+      - SERVER_SSL_ENABLED=true
+      - SERVER_SSL_BUNDLE=server
+      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_CERTIFICATE=file:///home/certs/fullchain.pem
+      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_PRIVATE_KEY=file:///home/certs/privkey.pem
       - LLM_HOST=face-emotion-api
       - OLLAMA_ENABLED=true
       - OLLAMA_HOST=ollama
@@ -52,7 +52,7 @@ services:
       - ../src/test/resources/videos:/home/input
     command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input --websocket.rateMillis=80 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
     deploy:
-      replicas: 3
+      replicas: 0
       resources:
         limits:
           cpus: "1"

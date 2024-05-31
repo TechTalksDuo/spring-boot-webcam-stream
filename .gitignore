@@ -1,5 +1,6 @@
 **/*.pem
 
+.docker/certbot/**
 .docker/grafana/data/**
 .docker/prometheus/data/**
 .docker/ollama/**
