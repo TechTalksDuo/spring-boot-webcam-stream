@@ -1,13 +1,19 @@
 # Spring Boot Webcam Stream
 
 This project simulates multiple users sharing their webcam. A Spring Boot Java application - backend, manages the websocket connection to broadcast
-the messages between participants. It also asks a LLM python model what emotions are present in the picture received from the users.
+the messages between participants. It also asks a LLM python model what emotions are present in the pictures received from the users.
+
 
 Screenshot:
 ![img.png](documentation%2Fimg.png)
 
 Sample video:
+
 ![sample.gif](documentation%2Fsample.gif)
+
+With this setup, we see the realtime interaction between multiple clients, a backend API and a slower system
+
+![grafana.png](documentation%2Fgrafana.png)
 
 
 Credits for videos from:
