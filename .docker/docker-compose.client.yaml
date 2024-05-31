@@ -10,7 +10,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-beautiful-woman-exited-surprise-face-expression --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-beautiful-woman-exited-surprise-face-expression --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -27,7 +27,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-woman-chatting-from-webcam-for-the-online-meeting --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-woman-chatting-from-webcam-for-the-online-meeting --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -44,46 +44,46 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-woman-greets-friends-on-webcam-online-meeting --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-woman-greets-friends-on-webcam-online-meeting --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
           cpus: "1"
           memory: 512M
-  client-5:
-    image: "amazoncorretto:21.0.3-al2023-headless"
-    platform: ${DOCKER_PLATFORM}
-    environment:
-      - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
-      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
-      - CLIENT_MODE=true
-    volumes:
-      - ../target:/home/app
-      - ../www:/home/www
-      - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/business-businessman-celebrating-success-excited-caucasian --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 512M
-  client-6:
-    image: "amazoncorretto:21.0.3-al2023-headless"
-    platform: ${DOCKER_PLATFORM}
-    environment:
-      - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
-      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
-      - CLIENT_MODE=true
-    volumes:
-      - ../target:/home/app
-      - ../www:/home/www
-      - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/excited-young-woman-play-games-by-mobile-phone-make-winner --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 512M
+#  client-5:
+#    image: "amazoncorretto:21.0.3-al2023-headless"
+#    platform: ${DOCKER_PLATFORM}
+#    environment:
+#      - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
+#      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
+#      - CLIENT_MODE=true
+#    volumes:
+#      - ../target:/home/app
+#      - ../www:/home/www
+#      - ../src/test/resources/videos:/home/input
+#    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/business-businessman-celebrating-success-excited-caucasian --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "1"
+#          memory: 512M
+#  client-6:
+#    image: "amazoncorretto:21.0.3-al2023-headless"
+#    platform: ${DOCKER_PLATFORM}
+#    environment:
+#      - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
+#      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
+#      - CLIENT_MODE=true
+#    volumes:
+#      - ../target:/home/app
+#      - ../www:/home/www
+#      - ../src/test/resources/videos:/home/input
+#    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/excited-young-woman-play-games-by-mobile-phone-make-winner --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "1"
+#          memory: 512M
   client-7:
     image: "amazoncorretto:21.0.3-al2023-headless"
     platform: ${DOCKER_PLATFORM}
@@ -95,63 +95,63 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/happy-senior-engineering-architect-wearing-a-vest-and-helmet --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/happy-senior-engineering-architect-wearing-a-vest-and-helmet --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
           cpus: "1"
           memory: 512M
-  client-8:
-    image: "amazoncorretto:21.0.3-al2023-headless"
-    platform: ${DOCKER_PLATFORM}
-    environment:
-      - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
-      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
-      - CLIENT_MODE=true
-    volumes:
-      - ../target:/home/app
-      - ../www:/home/www
-      - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-asian-beautiful-girl-pointing-blank-space-isolated --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 512M
-  client-9:
-    image: "amazoncorretto:21.0.3-al2023-headless"
-    platform: ${DOCKER_PLATFORM}
-    environment:
-      - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
-      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
-      - CLIENT_MODE=true
-    volumes:
-      - ../target:/home/app
-      - ../www:/home/www
-      - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-businessman-presentation-meeting-online-and --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 512M
-  client-10:
-    image: "amazoncorretto:21.0.3-al2023-headless"
-    platform: ${DOCKER_PLATFORM}
-    environment:
-      - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
-      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
-      - CLIENT_MODE=true
-    volumes:
-      - ../target:/home/app
-      - ../www:/home/www
-      - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-young-asian-customer-service-support-agent --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 512M
+#  client-8:
+#    image: "amazoncorretto:21.0.3-al2023-headless"
+#    platform: ${DOCKER_PLATFORM}
+#    environment:
+#      - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
+#      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
+#      - CLIENT_MODE=true
+#    volumes:
+#      - ../target:/home/app
+#      - ../www:/home/www
+#      - ../src/test/resources/videos:/home/input
+#    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-asian-beautiful-girl-pointing-blank-space-isolated --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "1"
+#          memory: 512M
+#  client-9:
+#    image: "amazoncorretto:21.0.3-al2023-headless"
+#    platform: ${DOCKER_PLATFORM}
+#    environment:
+#      - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
+#      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
+#      - CLIENT_MODE=true
+#    volumes:
+#      - ../target:/home/app
+#      - ../www:/home/www
+#      - ../src/test/resources/videos:/home/input
+#    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-businessman-presentation-meeting-online-and --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "1"
+#          memory: 512M
+#  client-10:
+#    image: "amazoncorretto:21.0.3-al2023-headless"
+#    platform: ${DOCKER_PLATFORM}
+#    environment:
+#      - OLLAMA_PROMPT_FILE=file:///home/www/assets/prompt.md
+#      - SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:///home/www
+#      - CLIENT_MODE=true
+#    volumes:
+#      - ../target:/home/app
+#      - ../www:/home/www
+#      - ../src/test/resources/videos:/home/input
+#    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-young-asian-customer-service-support-agent --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "1"
+#          memory: 512M
 #  client-11:
 #    image: "amazoncorretto:21.0.3-al2023-headless"
 #    platform: ${DOCKER_PLATFORM}
@@ -163,7 +163,7 @@ services:
 #      - ../target:/home/app
 #      - ../www:/home/www
 #      - ../src/test/resources/videos:/home/input
-#    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-young-asian-man-in-blue-shirt-smiling-and-waving --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
+#    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-young-asian-man-in-blue-shirt-smiling-and-waving --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
 #    deploy:
 #      resources:
 #        limits:
@@ -180,7 +180,7 @@ services:
 #      - ../target:/home/app
 #      - ../www:/home/www
 #      - ../src/test/resources/videos:/home/input
-#    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/smiling-portrait-of-handsome-young-asian-man-tourists --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
+#    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/smiling-portrait-of-handsome-young-asian-man-tourists --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
 #    deploy:
 #      resources:
 #        limits:
@@ -197,7 +197,7 @@ services:
 #      - ../target:/home/app
 #      - ../www:/home/www
 #      - ../src/test/resources/videos:/home/input
-#    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/young-man-working-on-his-laptop --websocket.rateMillis=140 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
+#    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/young-man-working-on-his-laptop --websocket.rateMillis=80 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=yolo.go.ro --server.port=0 --management.server.port=0"
 #    deploy:
 #      resources:
 #        limits:
