@@ -15,3 +15,5 @@ services:
       - ./certbot/www/:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/letsencrypt/:rw
       - ./certbot/logs/:/var/log/letsencrypt/:rw
+      -
+#docker-compose -f .docker/docker-compose.nginx.yaml run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ --dry-run -d <your-domain>
