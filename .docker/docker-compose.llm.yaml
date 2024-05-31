@@ -13,3 +13,9 @@ services:
         limits:
           cpus: "8"
           memory: 8G
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
