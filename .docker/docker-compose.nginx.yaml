@@ -15,5 +15,6 @@ services:
       - ./certbot/www/:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/letsencrypt/:rw
       - ./certbot/logs/:/var/log/letsencrypt/:rw
+# change <domain> nging/conf/app.conf
 #docker-compose -f .docker/docker-compose.nginx.yaml up webserver --force-recreate
-#docker-compose -f .docker/docker-compose.nginx.yaml run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ --dry-run -d <your-domain>
+#docker-compose -f .docker/docker-compose.nginx.yaml run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ --dry-run -d <domain>
