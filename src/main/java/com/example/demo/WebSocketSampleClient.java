@@ -36,16 +36,19 @@ public class WebSocketSampleClient implements CommandLineRunner {
     private final int rateMillis;
     private final int port;
     private final String host;
+    private final String protocol;
     private final ObjectMapper mapper;
     private final ScheduledExecutorService scheduledService = Executors.newSingleThreadScheduledExecutor();
     private final AtomicReference<ScheduledFuture<?>> scheduledFuture = new AtomicReference<>();
 
     public WebSocketSampleClient(WebSocketClient client, List<File> availableImages,
+                                 @Value("${websocket.protocol:ws}") String protocol,
                                  @Value("${websocket.rateMillis}") int rateMillis,
                                  @Value("${websocket.target.port}") int port,
                                  @Value("${websocket.target.host:localhost}") String host, ObjectMapper mapper
     ) {
         this.client = client;
+        this.protocol = protocol;
         this.rateMillis = rateMillis;
         this.port = port;
         this.host = host;
@@ -55,7 +58,7 @@ public class WebSocketSampleClient implements CommandLineRunner {
         File[] frames = availableImages.get(random)
                 .listFiles();
         this.availableImages = Arrays.stream(frames)
-//                .sorted()
+                .sorted()
                 .map(frame -> {
                     try {
                         return "data:image/jpeg;base64," +
@@ -80,7 +83,7 @@ public class WebSocketSampleClient implements CommandLineRunner {
 //                                scheduledFuture.set(scheduledService.scheduleAtFixedRate(sendImageToSession(message.session()), 0, 500, TimeUnit.MILLISECONDS));
 //                            }
                         }
-                ), "ws://" + host + ":" + port + "/websocket")
+                ), protocol + "://" + host + ":" + port + "/websocket")
                 .thenApply(session -> {
                     scheduledFuture.set(scheduledService.scheduleAtFixedRate(sendImageToSession(session), 0, rateMillis, TimeUnit.MILLISECONDS));
                     return session;
