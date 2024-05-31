@@ -47,7 +47,7 @@ public class ClientModeConfig {
     @Bean
     List<File> availableImages(@Value("${websocket.input.dir}") String inputDir) throws FileNotFoundException {
         return Arrays.stream(ResourceUtils.getFile(inputDir).listFiles())
-                .filter(File :: isDirectory)
+                .sorted()
                 .toList();
 
     }

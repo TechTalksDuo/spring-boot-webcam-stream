@@ -54,11 +54,8 @@ public class WebSocketSampleClient implements CommandLineRunner {
         this.host = host;
         this.mapper = mapper;
 
-        var random = ThreadLocalRandom.current().nextInt(availableImages.size());
-        File[] frames = availableImages.get(random)
-                .listFiles();
-        this.availableImages = Arrays.stream(frames)
-                .sorted()
+        this.availableImages = availableImages
+                .stream()
                 .map(frame -> {
                     try {
                         return "data:image/jpeg;base64," +
