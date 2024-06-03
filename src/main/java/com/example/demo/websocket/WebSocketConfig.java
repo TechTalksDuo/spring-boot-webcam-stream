@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -40,6 +42,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
     BroadcastService broadcastService;
     @Autowired
     WebSocketMetrics metrics;
+//    private final ExecutorService executorService = Executors.newThreadPerTaskExecutor(
+//            Thread.ofVirtual()
+//                    .name("virtual-threads")
+//                    .factory()
+//    );
 
 
     @Bean
@@ -114,19 +121,19 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
                 session.setTextMessageSizeLimit(2 * 1024 * 1024);
 //                TODO decorator session?
-                ConcurrentWebSocketSessionDecorator decorator = new ConcurrentWebSocketSessionDecorator(session, 1_000, 64 * 1024,
-                        ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
+//                ConcurrentWebSocketSessionDecorator decorator = new ConcurrentWebSocketSessionDecorator(session, 1_000, 64 * 1024,
+//                        ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
                 String principal = availableUsernames.get(ThreadLocalRandom.current().nextInt(availableUsernames.size()));
                 session.getAttributes().put("username", principal);
                 session.getAttributes().put("id", UUID.randomUUID());
                 availableUsernames.remove(principal);
 
-                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(decorator);
+                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(session);
 
                 if (availableUsernames.isEmpty()) {
                     availableUsernames.addAll(usernames.stream().map(s -> s + "-" + onlineUsers.size()).toList());
                 }
-                decorator.sendMessage(new TextMessage(toStringValue(
+                session.sendMessage(new TextMessage(toStringValue(
                         new Messages.UserConnectedMessage(principal, onlineUsers))));
 
             } catch (IOException e) {
