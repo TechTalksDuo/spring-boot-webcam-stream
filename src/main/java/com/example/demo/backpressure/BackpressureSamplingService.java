@@ -19,8 +19,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class BackpressureSamplingService {
 
     private static final Logger log = getLogger(BackpressureSamplingService.class);
-    static final int QUEUE_SIZE = 5;
-    static final int NUMBER_OF_THREADS = 10;
+    static final int QUEUE_SIZE = 64;
+    static final int NUMBER_OF_THREADS = 32;
     private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>(QUEUE_SIZE);
     private final Executor executor = new ThreadPoolExecutor(NUMBER_OF_THREADS, NUMBER_OF_THREADS, 0L, TimeUnit.MILLISECONDS, workQueue);
     //        private final Executor executor = Executors.newFixedThreadPool(5);
