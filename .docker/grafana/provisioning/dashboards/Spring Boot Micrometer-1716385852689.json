@@ -125,7 +125,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -204,7 +204,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -289,7 +289,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -382,7 +382,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -401,8 +401,7 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "fdmngub4gr4lca"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -478,6 +477,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
@@ -504,8 +504,7 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "fdmngub4gr4lca"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -581,6 +580,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
@@ -649,6 +649,7 @@
           "values": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -796,6 +797,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
@@ -944,6 +946,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
@@ -970,6 +973,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -1061,7 +1065,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -1092,6 +1096,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -1184,7 +1189,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -1215,6 +1220,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -1375,7 +1381,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -1407,6 +1413,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -1477,7 +1484,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -1557,6 +1564,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -1649,7 +1657,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -1683,6 +1691,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -1771,7 +1780,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -1804,6 +1813,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -1908,7 +1918,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -1940,6 +1950,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -2041,7 +2052,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -2079,6 +2090,7 @@
         "trace": "#6ED0E0",
         "warn": "#EAB839"
       },
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -2169,7 +2181,7 @@
         "sort": 0,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -2226,6 +2238,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -2322,7 +2335,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -2374,6 +2387,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -2470,7 +2484,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -2505,7 +2519,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 74
+        "y": 67
       },
       "id": 112,
       "panels": [],
@@ -2522,6 +2536,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -2533,7 +2548,7 @@
         "h": 7,
         "w": 8,
         "x": 0,
-        "y": 75
+        "y": 68
       },
       "id": 98,
       "legend": {
@@ -2587,7 +2602,7 @@
         "sort": 0,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "mode": "time",
         "show": true,
@@ -2610,6 +2625,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -2621,7 +2637,7 @@
         "h": 7,
         "w": 8,
         "x": 8,
-        "y": 75
+        "y": 68
       },
       "id": 101,
       "legend": {
@@ -2697,7 +2713,7 @@
         "sort": 0,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "mode": "time",
         "show": true,
@@ -2720,6 +2736,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -2731,7 +2748,7 @@
         "h": 7,
         "w": 8,
         "x": 16,
-        "y": 75
+        "y": 68
       },
       "id": 99,
       "legend": {
@@ -2783,7 +2800,7 @@
         "sort": 0,
         "value_type": "individual"
       },
-      "type": "graph",
+      "type": "timeseries",
       "xaxis": {
         "mode": "time",
         "show": true,
@@ -2812,7 +2829,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 82
+        "y": 75
       },
       "id": 113,
       "panels": [],
@@ -2829,6 +2846,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -2846,7 +2864,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 83
+        "y": 76
       },
       "id": 37,
       "legend": {
@@ -2891,7 +2909,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -2919,6 +2937,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -2936,7 +2955,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 83
+        "y": 76
       },
       "id": 38,
       "legend": {
@@ -3006,7 +3025,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -3041,7 +3060,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 90
+        "y": 83
       },
       "id": 114,
       "panels": [],
@@ -3058,6 +3077,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -3075,7 +3095,7 @@
         "h": 7,
         "w": 6,
         "x": 0,
-        "y": 91
+        "y": 84
       },
       "id": 33,
       "legend": {
@@ -3132,7 +3152,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -3160,6 +3180,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -3177,7 +3198,7 @@
         "h": 7,
         "w": 6,
         "x": 6,
-        "y": 91
+        "y": 84
       },
       "id": 83,
       "legend": {
@@ -3222,7 +3243,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -3251,6 +3272,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -3268,7 +3290,7 @@
         "h": 7,
         "w": 6,
         "x": 12,
-        "y": 91
+        "y": 84
       },
       "id": 85,
       "legend": {
@@ -3325,7 +3347,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -3353,6 +3375,7 @@
     },
     {
       "aliasColors": {},
+      "autoMigrateFrom": "graph",
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -3370,7 +3393,7 @@
         "h": 7,
         "w": 6,
         "x": 18,
-        "y": 91
+        "y": 84
       },
       "id": 84,
       "legend": {
@@ -3415,7 +3438,7 @@
         "sort": 0,
         "value_type": "cumulative"
       },
-      "type": "graph",
+      "type": "timeseries",
       "x-axis": true,
       "xaxis": {
         "mode": "time",
@@ -3456,8 +3479,7 @@
           "value": ""
         },
         "datasource": {
-          "type": "prometheus",
-          "uid": "fdmngub4gr4lca"
+          "type": "prometheus"
         },
         "definition": "",
         "hide": 0,
@@ -3484,8 +3506,7 @@
           "value": "app:8080"
         },
         "datasource": {
-          "type": "prometheus",
-          "uid": "fdmngub4gr4lca"
+          "type": "prometheus"
         },
         "definition": "",
         "hide": 0,
@@ -3513,8 +3534,7 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "prometheus",
-          "uid": "fdmngub4gr4lca"
+          "type": "prometheus"
         },
         "definition": "",
         "hide": 0,
@@ -3542,8 +3562,7 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "prometheus",
-          "uid": "fdmngub4gr4lca"
+          "type": "prometheus"
         },
         "definition": "",
         "hide": 0,
@@ -3569,6 +3588,7 @@
     "from": "now-5m",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {
     "now": true,
     "refresh_intervals": [

@@ -56,39 +56,36 @@ public class BackpressureSamplingService {
         log.trace("sample - user {}", id);
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expirationTime = inProgress.compute(id, (k, v) -> {
-            if (v == null && v.isAfter(now)) {
+        inProgress.compute(id, (k, v) -> {
+            if (v == null || now.isAfter(v)) {
+                callMethod(id, runnable);
                 return now.plusSeconds(2);
             }
+            log.debug("sample - skip user {} until expirationTime: {}", id, v);
+            metrics.onDroppedRequest();
             return v;
         });
-        boolean firstTimeSampleFromUser = expirationTime == null;
-        boolean shouldTriggerProcessing = false;
-        boolean waitUntilExpirationTime = firstTimeSampleFromUser ? shouldTriggerProcessing : expirationTime.isAfter(now);
 
-        if (waitUntilExpirationTime) {
-            log.debug("sample - skip user {} until expirationTime: {}", id, expirationTime);
-            metrics.onDroppedRequest();
-        } else {
-            try {
-                metrics.onSubmit();
-                executor.execute(() -> {
-                    log.info("sample - starting user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
-                    try {
-                        runnable.run();
-                        log.info("sample - finished user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
-                        metrics.onFinishedRequest();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        metrics.onError();
-                    }
-                });
-            } catch (Exception e) {
-                metrics.onRejectedRequest();
-                log.debug("sample - skip user {} due to limit reached: {}/{}", id, workQueue.size(), QUEUE_SIZE);
-            }
+    }
+
+    private void callMethod(UUID id, Runnable runnable) {
+        try {
+            metrics.onSubmit();
+            executor.execute(() -> {
+                log.info("sample - starting user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
+                try {
+                    runnable.run();
+                    log.info("sample - finished user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
+                    metrics.onFinishedRequest();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    metrics.onError();
+                }
+            });
+        } catch (Exception e) {
+            metrics.onRejectedRequest();
+            log.debug("sample - skip user {} due to limit reached: {}/{}", id, workQueue.size(), QUEUE_SIZE);
         }
-
     }
 
 }

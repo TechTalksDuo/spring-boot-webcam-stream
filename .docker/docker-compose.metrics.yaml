@@ -21,6 +21,7 @@ services:
   grafana:
     image: grafana/grafana
     container_name: "grafana"
+    platform: ${DOCKER_PLATFORM}
     user: "104"
     ports:
       - 3001:3000
