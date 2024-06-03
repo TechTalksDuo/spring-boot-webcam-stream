@@ -2,7 +2,7 @@ import { LitElement, html, css } from "https://esm.run/lit/index.js";
 
 import "./video-feedback.js";
 import { getRandomColor } from "../utils/color.js";
-import { WebSocketEvent, WebSocketState } from "../events/websocket.js";
+import { WebSocketEvent, WebSocketEventType, WebSocketState } from "../events/websocket.js";
 import { UserEvents, UserState } from "../events/user.js";
 
 class VideoSource extends LitElement {
@@ -156,6 +156,7 @@ class VideoSource extends LitElement {
     clearInterval(this.#videoUpdateInterval);
     video.srcObject = null;
     this.isVideoActive = false;
+    WebSocketState?.send({ type: WebSocketEventType.videoStopped });
   }
 
   #streamVideo(video, localVideoStream) {
@@ -168,7 +169,7 @@ class VideoSource extends LitElement {
       snapshotCanvas.getContext("2d").clearRect(0, 0, width, height);
       snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
       const encodedData = snapshotCanvas.toDataURL("image/jpeg", this.#videoQuality);
-      WebSocketState?.send(JSON.stringify({ videoStream: encodedData }));
+      WebSocketState?.send({ videoStream: encodedData });
     }, 1000 / 12);
   }
 }
