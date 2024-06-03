@@ -41,7 +41,7 @@ public class BroadcastService {
 //    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
     private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 //    private final ExecutorService executorService = Executors.newWorkStealingPool();
-    private final Map<String, WebSocketSession> allSessions = new ConcurrentHashMap<>();
+    private final Map<String, BufferingWebSocketSession> allSessions = new ConcurrentHashMap<>();
     private final BackpressureSamplingService samplingService;
     private final String prompt;
     private final boolean ollamaEnabled;
@@ -58,7 +58,7 @@ public class BroadcastService {
 
     @Timed
     public List<Messages.OnlineUser> registerSession(WebSocketSession session) {
-        allSessions.put(session.getId(), session);
+        allSessions.put(session.getId(), new BufferingWebSocketSession(session));
         byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get("username"), true, allSessions.size()));
         TextMessage message = new TextMessage(payload);
         sendAll(message, session);
@@ -68,16 +68,20 @@ public class BroadcastService {
     private List<Messages.OnlineUser> getActiveUsers() {
         return allSessions.entrySet()
                 .stream()
-                .map(s -> new Messages.OnlineUser((String) s.getValue().getAttributes().get("username")))
+                .map(s -> new Messages.OnlineUser((String) s.getValue().getDelegate().getAttributes().get("username")))
                 .toList();
     }
 
     @Timed
     public void unregisterSession(WebSocketSession session) {
-        allSessions.remove(session.getId());
-        byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get("username"), false, allSessions.size()));
-        TextMessage message = new TextMessage(payload);
-        sendAll(message, session);
+        BufferingWebSocketSession removed = allSessions.remove(session.getId());
+        try {
+            byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get("username"), false, allSessions.size()));
+            TextMessage message = new TextMessage(payload);
+            sendAll(message, session);
+        } finally {
+            removed.cancel();
+        }
     }
 
     @Timed
@@ -142,28 +146,28 @@ public class BroadcastService {
 //        );
 //        return CompletableFuture.completedFuture(null);
 //        TODO try in parallel OOM killed after 10 rate with 10 instances
-        allSessions.entrySet().stream().forEach(k -> {
-                    var session = k.getValue();
-                    if (senderSessionToSkip == null || !senderSessionToSkip.equals(session) ) {
-                        executorService.submit(() -> {
-                            try {
-                                session.sendMessage(message);
-                                return session;
-                            } catch (IOException e) {
-                                log.warn("send - error", e);
-                                // TODO remove session from list
-                                try {
-                                    session.close(CloseStatus.SERVER_ERROR);
-                                } catch (IOException ex) {
-                                    log.warn("can't close session: {}", session, ex);
-                                }
-                                unregisterSession(session);
-                                return session;
-                            }
-                        });
-                    }
-                });
-        return CompletableFuture.completedFuture(null);
+//        allSessions.entrySet().stream().forEach(k -> {
+//                    var session = k.getValue();
+//                    if (senderSessionToSkip == null || !senderSessionToSkip.equals(session) ) {
+//                        executorService.submit(() -> {
+//                            try {
+//                                session.sendMessage(message);
+//                                return session;
+//                            } catch (IOException e) {
+//                                log.warn("send - error", e);
+//                                // TODO remove session from list
+//                                try {
+//                                    session.close(CloseStatus.SERVER_ERROR);
+//                                } catch (IOException ex) {
+//                                    log.warn("can't close session: {}", session, ex);
+//                                }
+//                                unregisterSession(session);
+//                                return session;
+//                            }
+//                        });
+//                    }
+//                });
+//        return CompletableFuture.completedFuture(null);
 //                CompletableFuture.supplyAsync(() -> {
 //                            try {
 ////                                log.info("sendAll broadcast to: {}", session.getId());
@@ -184,6 +188,23 @@ public class BroadcastService {
 //        ).toList();
 //        return CompletableFuture.allOf();
 //        return CompletableFuture.allOf(all.toArray(new CompletableFuture[]{}));// TODO OOM
+
+//        TODO send per thread
+        allSessions.forEach((k, v) -> {
+                    try {
+                        if ( senderSessionToSkip == null || !senderSessionToSkip.getId().equals(v.getDelegate().getId())) {
+                            if (v.getDelegate().isOpen())
+                                v.sendMessage(message);
+                            else
+                                unregisterSession(v.getDelegate());
+                        }
+                    } catch (SessionLimitExceededException e) {
+                        log.warn("send - error", e);
+                        // TODO remove session from list
+                    }
+                }
+        );
+        return CompletableFuture.completedFuture(null);
     }
 
 
