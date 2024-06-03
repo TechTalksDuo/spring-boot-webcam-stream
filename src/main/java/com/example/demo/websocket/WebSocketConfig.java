@@ -121,19 +121,19 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
                 session.setTextMessageSizeLimit(2 * 1024 * 1024);
 //                TODO decorator session?
-//                ConcurrentWebSocketSessionDecorator decorator = new ConcurrentWebSocketSessionDecorator(session, 1_000, 16 * 1024,
-//                        ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
+                ConcurrentWebSocketSessionDecorator decorator = new ConcurrentWebSocketSessionDecorator(session, 1_000, 16 * 1024,
+                        ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
                 String principal = availableUsernames.get(ThreadLocalRandom.current().nextInt(availableUsernames.size()));
                 session.getAttributes().put("username", principal);
                 session.getAttributes().put("id", UUID.randomUUID());
                 availableUsernames.remove(principal);
 
-                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(session);
+                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(decorator);
 
                 if (availableUsernames.isEmpty()) {
                     availableUsernames.addAll(usernames.stream().map(s -> s + "-" + onlineUsers.size()).toList());
                 }
-                session.sendMessage(new TextMessage(toStringValue(
+                decorator.sendMessage(new TextMessage(toStringValue(
                         new Messages.UserConnectedMessage(principal, onlineUsers))));
 
             } catch (IOException e) {
