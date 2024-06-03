@@ -38,8 +38,8 @@ public class BroadcastService {
     @Autowired
     LLMClient client;
 //    private final ExecutorService executorService = ForkJoinPool.commonPool();
-//    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
-    private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+   private final ExecutorService executorService = Executors.newFixedThreadPool(64);
+    // private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 //    private final ExecutorService executorService = Executors.newWorkStealingPool();
     private final Map<String, WebSocketSession> allSessions = new ConcurrentHashMap<>();
     private final BackpressureSamplingService samplingService;
