@@ -18,6 +18,13 @@ class VideoSource extends LitElement {
       this.requestUpdate();
     });
 
+    WebSocketState.addEventListener(WebSocketEvent.open, () => {
+      if (this.isVideoActive) {
+        const video = this.shadowRoot.querySelector("video");
+        this.#streamVideo(video, this.#localVideoStream);
+      }
+    });
+
     WebSocketState.addEventListener(WebSocketEvent.close, () => {
       clearInterval(this.#videoUpdateInterval);
     });
