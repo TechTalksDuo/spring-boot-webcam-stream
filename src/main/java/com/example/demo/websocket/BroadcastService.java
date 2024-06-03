@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.*;
@@ -40,7 +41,7 @@ public class BroadcastService {
 //    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
     private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 //    private final ExecutorService executorService = Executors.newWorkStealingPool();
-    private final Set<WebSocketSession> allSessions = new ConcurrentSkipListSet<>();
+    private final Map<String, WebSocketSession> allSessions = new ConcurrentHashMap<>();
     private final BackpressureSamplingService samplingService;
     private final String prompt;
     private final boolean ollamaEnabled;
@@ -57,7 +58,7 @@ public class BroadcastService {
 
     @Timed
     public List<Messages.OnlineUser> registerSession(WebSocketSession session) {
-        allSessions.add(session);
+        allSessions.put(session.getId(), session);
         byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get("username"), true, allSessions.size()));
         TextMessage message = new TextMessage(payload);
         sendAll(message, session);
@@ -65,14 +66,15 @@ public class BroadcastService {
     }
 
     private List<Messages.OnlineUser> getActiveUsers() {
-        return allSessions.stream()
-                .map(s -> new Messages.OnlineUser((String) s.getAttributes().get("username")))
+        return allSessions.entrySet()
+                .stream()
+                .map(s -> new Messages.OnlineUser((String) s.getValue().getAttributes().get("username")))
                 .toList();
     }
 
     @Timed
     public void unregisterSession(WebSocketSession session) {
-        allSessions.remove(session);
+        allSessions.remove(session.getId());
         byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get("username"), false, allSessions.size()));
         TextMessage message = new TextMessage(payload);
         sendAll(message, session);
@@ -140,7 +142,8 @@ public class BroadcastService {
 //        );
 //        return CompletableFuture.completedFuture(null);
 //        TODO try in parallel OOM killed after 10 rate with 10 instances
-        allSessions.forEach(session -> {
+        allSessions.entrySet().stream().forEach(k -> {
+                    var session = k.getValue();
                     if (senderSessionToSkip == null || !senderSessionToSkip.equals(session) ) {
                         executorService.submit(() -> {
                             try {
