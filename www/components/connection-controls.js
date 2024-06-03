@@ -63,7 +63,7 @@ class ConnectionControls extends LitElement {
       border-radius: 0.5rem;
       border: 0.25rem solid;
       color: #fff;
-      font-size: clamp(0.75rem, 7.5vmin, 1.5rem);
+      font-size: clamp(0.75rem, 3vmin, 1.5rem);
       display: inline-flex;
       gap: 0.5rem;
 
@@ -73,7 +73,7 @@ class ConnectionControls extends LitElement {
     }
 
     .feather {
-      width: clamp(0.75rem, 7.5vmin, 1.5rem);
+      width: clamp(0.75rem, 3vmin, 1.5rem);
       aspect-ratio: 1;
       stroke: currentColor;
       stroke-width: 2;
