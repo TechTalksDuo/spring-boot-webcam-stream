@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.*;
 
@@ -39,7 +40,7 @@ public class BroadcastService {
 //    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
     private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 //    private final ExecutorService executorService = Executors.newWorkStealingPool();
-    private final List<WebSocketSession> allSessions = new CopyOnWriteArrayList<>();
+    private final Set<WebSocketSession> allSessions = new ConcurrentSkipListSet<>();
     private final BackpressureSamplingService samplingService;
     private final String prompt;
     private final boolean ollamaEnabled;
