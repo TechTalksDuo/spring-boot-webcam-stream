@@ -16,6 +16,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
+import org.springframework.web.socket.handler.SessionLimitExceededException;
 
 import java.io.File;
 import java.io.IOException;
@@ -130,7 +131,7 @@ public class BroadcastService {
                             else
                                 unregisterSession(session);
                         }
-                    } catch (IOException e) {
+                    } catch (IOException | SessionLimitExceededException e) {
                         log.warn("send - error", e);
                         // TODO remove session from list
                     }
