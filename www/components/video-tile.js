@@ -66,7 +66,7 @@ class VideoTile extends LitElement {
       color: #fff;
       border-radius: 0 0.5rem 0 0;
       z-index: 100;
-      font-size: clamp(0.5rem, 5vmin, 1rem);
+      font-size: clamp(0.5rem, 3vmin, 1rem);
     }
   `;
 
