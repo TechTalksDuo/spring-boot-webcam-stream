@@ -20,7 +20,7 @@ class WebSocketEventTarget extends EventTarget {
   open() {
     if (this.readyState !== 3) return;
 
-    const protocol = window.location.protocol.startsWith("https") == 0 ? "wss" : "ws";
+    const protocol = window.location.protocol.startsWith("https") ? "wss" : "ws";
     this.#websocket = new WebSocket(`${protocol}://${window.location.host}/websocket`);
     console.info("WebSocket opening...");
     this.#websocket.onopen = () => {
