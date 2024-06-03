@@ -6,7 +6,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -51,7 +56,12 @@ public class BackpressureSamplingService {
         log.trace("sample - user {}", id);
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expirationTime = inProgress.putIfAbsent(id, now.plusSeconds(2));
+        LocalDateTime expirationTime = inProgress.compute(id, (k, v) -> {
+            if (v == null && v.isAfter(now)) {
+                return now.plusSeconds(2);
+            }
+            return v;
+        });
         boolean firstTimeSampleFromUser = expirationTime == null;
         boolean shouldTriggerProcessing = false;
         boolean waitUntilExpirationTime = firstTimeSampleFromUser ? shouldTriggerProcessing : expirationTime.isAfter(now);
