@@ -3,62 +3,62 @@ services:
     extends:
       file: .docker/docker-compose.app.yaml
       service: app
-  client-1:
-    deploy:
-      replicas: 2
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-1
-  client-2:
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-2
-  client-3:
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-3
-  client-4:
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-4
-  client-5:
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-5
-  client-6:
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-6
-  client-7:
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-7
-  client-8:
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-8
-  client-9:
-    deploy:
-      replicas: 2
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-9
-  client-10:
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-10
-  client-11:
-    deploy:
-      replicas: 2
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-11
-  client-12:
-    deploy:
-      replicas: 2
-    extends:
-      file: .docker/docker-compose.client.yaml
-      service: client-12
+#  client-1:
+#    deploy:
+#      replicas: 2
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-1
+#  client-2:
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-2
+#  client-3:
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-3
+#  client-4:
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-4
+#  client-5:
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-5
+#  client-6:
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-6
+#  client-7:
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-7
+#  client-8:
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-8
+#  client-9:
+#    deploy:
+#      replicas: 2
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-9
+#  client-10:
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-10
+#  client-11:
+#    deploy:
+#      replicas: 2
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-11
+#  client-12:
+#    deploy:
+#      replicas: 2
+#    extends:
+#      file: .docker/docker-compose.client.yaml
+#      service: client-12
   prometheus:
     extends:
       file: .docker/docker-compose.metrics.yaml
