@@ -107,6 +107,7 @@ class VideoTile extends LitElement {
   }
 
   #dataURItoBlob(dataURI) {
+    if (!dataURI) return null;
     const byteString = atob(dataURI.split(",")[1]);
     const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
     const arrayBuffer = new ArrayBuffer(byteString.length);
