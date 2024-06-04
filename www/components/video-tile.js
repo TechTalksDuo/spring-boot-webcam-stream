@@ -92,7 +92,7 @@ class VideoTile extends LitElement {
     const interval = setInterval(() => {
       if (!videoStream.length || !this.isStreaming) clearInterval(interval);
       const img = this.shadowRoot.querySelector("img");
-      const blob = this.#dataURItoBlob(videoStream);
+      const blob = this.#dataURItoBlob(videoStream.shift());
       if (blob) {
         URL.revokeObjectURL(img.src);
         img.src = URL.createObjectURL(blob);
