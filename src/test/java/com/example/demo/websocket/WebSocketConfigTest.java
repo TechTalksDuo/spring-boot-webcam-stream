@@ -43,13 +43,7 @@ class WebSocketConfigTest {
     void test() throws IOException, InterruptedException {
 
         var random = ThreadLocalRandom.current().nextInt(availableImages.length);
-        List<String> images = Arrays.asList(new String[12]).stream().map(i -> {
-            try {
-                return Base64.getEncoder().encodeToString(Files.readAllBytes(availableImages[random].toPath()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList();
+        String image = Base64.getEncoder().encodeToString(Files.readAllBytes(availableImages[random].toPath()));
 
         client.execute(new SampleWebSocketHandler(message -> {
             // TODO change rate
@@ -58,7 +52,7 @@ class WebSocketConfigTest {
 
                     try {
                         session.sendMessage(new TextMessage(toStringValue(
-                                new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, images))));
+                                new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, image))));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
