@@ -6,6 +6,7 @@ import { WebSocketState, WebSocketEvent, WebSocketEventType } from "../events/we
 
 class VideoTile extends LitElement {
   #frameRate = 12;
+  #incomingMessageInterval;
 
   constructor() {
     super();
@@ -89,8 +90,10 @@ class VideoTile extends LitElement {
   }
 
   #showIncomingImage(videoStream) {
-    const interval = setInterval(() => {
-      if (!videoStream.length || !this.isStreaming) clearInterval(interval);
+    if (this.#incomingMessageInterval) clearInterval(this.#incomingMessageInterval);
+
+    this.#incomingMessageInterval = setInterval(() => {
+      if (!videoStream.length || !this.isStreaming) clearInterval(this.#incomingMessageInterval);
       const img = this.shadowRoot.querySelector("img");
       const blob = this.#dataURItoBlob(videoStream.shift());
       if (blob) {
