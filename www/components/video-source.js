@@ -184,7 +184,7 @@ class VideoSource extends LitElement {
         buffer = [];
       }
       // WebSocketState?.send({ videoStream: encodedData });
-    }, 1000 / this.#frameRate);
+    }, 1000 / (this.#frameRate / 2));
   }
 }
 
