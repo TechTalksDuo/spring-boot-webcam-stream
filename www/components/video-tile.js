@@ -100,7 +100,7 @@ class VideoTile extends LitElement {
         URL.revokeObjectURL(img.src);
         img.src = URL.createObjectURL(blob);
       }
-    }, 1000 / this.#frameRate);
+    }, 1000 / (this.#frameRate / 2));
     // const img = this.shadowRoot.querySelector("img");
     // URL.revokeObjectURL(img.src);
     // img.src = URL.createObjectURL(this.#dataURItoBlob(videoStream));
