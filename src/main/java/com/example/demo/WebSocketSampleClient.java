@@ -72,30 +72,51 @@ public class WebSocketSampleClient implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        client.execute(new ExistOnCloseWebSocketHandler(
-                        message -> {
-                            // TODO change rate
-//                            if (message.equals("something") && scheduledFuture.get() != null) {
-//                                scheduledFuture.get().cancel(true);
-//                                scheduledFuture.set(scheduledService.scheduleAtFixedRate(sendImageToSession(message.session()), 0, 500, TimeUnit.MILLISECONDS));
-//                            }
-                        }
-                ), protocol + "://" + host + ":" + port + "/websocket")
-                .thenApply(session -> {
-                    scheduledFuture.set(scheduledService.scheduleAtFixedRate(sendImageToSession(session), 0, rateMillis, TimeUnit.MILLISECONDS));
-                    return session;
-                })
-                .handle((session, ex) -> {
-                    if (ex != null) {
-                        try {
-                            session.close(CloseStatus.SERVER_ERROR);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    return null;
-                });
+        WebSocketSession session = client.execute(new ExistOnCloseWebSocketHandler(
+                message -> {
+
+                }
+        ), protocol + "://" + host + ":" + port + "/websocket").get();
+
+        while (true) {
+            try {
+                String image = getImage();
+                session.sendMessage(new TextMessage(toStringValue(
+                        new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, image))));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            Thread.sleep(rateMillis);
+        }
     }
+
+//    @Override
+//    public void run(String... args) throws Exception {
+//
+//        client.execute(new ExistOnCloseWebSocketHandler(
+//                        message -> {
+//                            // TODO change rate
+////                            if (message.equals("something") && scheduledFuture.get() != null) {
+////                                scheduledFuture.get().cancel(true);
+////                                scheduledFuture.set(scheduledService.scheduleAtFixedRate(sendImageToSession(message.session()), 0, 500, TimeUnit.MILLISECONDS));
+////                            }
+//                        }
+//                ), protocol + "://" + host + ":" + port + "/websocket")
+//                .thenApply(session -> {
+//                    scheduledFuture.set(scheduledService.scheduleAtFixedRate(sendImageToSession(session), 0, rateMillis, TimeUnit.MILLISECONDS));
+//                    return session;
+//                })
+//                .handle((session, ex) -> {
+//                    if (ex != null) {
+//                        try {
+//                            session.close(CloseStatus.SERVER_ERROR);
+//                        } catch (IOException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    }
+//                    return null;
+//                });
+//    }
 
     Runnable sendImageToSession(WebSocketSession session) {
         return () -> {

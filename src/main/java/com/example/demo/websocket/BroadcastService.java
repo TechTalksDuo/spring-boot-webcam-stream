@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -189,12 +190,13 @@ public class BroadcastService {
 //        return CompletableFuture.allOf();
 //        return CompletableFuture.allOf(all.toArray(new CompletableFuture[]{}));// TODO OOM
 
+        var timedTextMessage = new BufferingWebSocketSession.TimedTextMessage(message, LocalDateTime.now());
 //        TODO send per thread
         allSessions.forEach((k, v) -> {
                     try {
                         if ( senderSessionToSkip == null || !senderSessionToSkip.getId().equals(v.getDelegate().getId())) {
                             if (v.getDelegate().isOpen())
-                                v.sendMessage(message);
+                                v.sendMessage(timedTextMessage);
                             else
                                 unregisterSession(v.getDelegate());
                         }
