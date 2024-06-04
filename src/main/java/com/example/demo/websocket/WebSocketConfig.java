@@ -44,17 +44,18 @@ public class WebSocketConfig implements WebSocketConfigurer {
     WebSocketMetrics metrics;
     @Autowired
     WebSocketSessionMetrics sessionMetrics;
-//    private final ExecutorService executorService = Executors.newThreadPerTaskExecutor(
-//            Thread.ofVirtual()
-//                    .name("virtual-threads")
-//                    .factory()
-//    );
-
+    // private final ExecutorService executorService =
+    // Executors.newThreadPerTaskExecutor(
+    // Thread.ofVirtual()
+    // .name("virtual-threads")
+    // .factory()
+    // );
 
     @Bean
-    public List<String> usernames(@Value("${usernames.path:file:///home/www/assets/username-list.md}") String usernamesPath) {
+    public List<String> usernames(
+            @Value("${usernames.path:file:///home/www/assets/username-list.md}") String usernamesPath) {
         try {
-            String  usernameContent = Files
+            String usernameContent = Files
                     .readString(ResourceUtils.getFile(usernamesPath).toPath());
             String[] usernameList = usernameContent.split("\n");
             return Arrays.stream(usernameList).toList();
@@ -88,45 +89,50 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 // ignore
             }
         }
+
         @Override
         public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
-            metrics.onMessage( (String) session.getAttributes().get("username"));
-// Handle incoming messages here
-////            TODO process async
-//            executorService.submit(() -> {
-//
-//                String receivedMessage = (String) message.getPayload();
-//// Process the message and send a response if needed`
-//                try {
-//                    Messages.ContributionMessage contribution = mapper.readValue(receivedMessage, Messages.ContributionMessage.class);
-//                    broadcastService.send(session, contribution)
-//                            .join();
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            });
-//
+            metrics.onMessage((String) session.getAttributes().get("username"));
+            // Handle incoming messages here
+            //// TODO process async
+            // executorService.submit(() -> {
+            //
+            // String receivedMessage = (String) message.getPayload();
+            //// Process the message and send a response if needed`
+            // try {
+            // Messages.ContributionMessage contribution = mapper.readValue(receivedMessage,
+            // Messages.ContributionMessage.class);
+            // broadcastService.send(session, contribution)
+            // .join();
+            // } catch (IOException e) {
+            // throw new RuntimeException(e);
+            // }
+            // });
+            //
             String receivedMessage = (String) message.getPayload();
-// Process the message and send a response if needed`
+            // Process the message and send a response if needed`
             try {
-                Messages.ContributionMessage contribution = mapper.readValue(receivedMessage, Messages.ContributionMessage.class);
+                Messages.ContributionMessage contribution = mapper.readValue(receivedMessage,
+                        Messages.ContributionMessage.class);
                 broadcastService.send(session, contribution);
             } catch (IOException e) {
                 log.warn("can't process message", e);
             }
         }
+
         @Override
         public void afterConnectionEstablished(WebSocketSession session) {
             metrics.onNewSession();
-// Perform actions when a new WebSocket connection is established
+            // Perform actions when a new WebSocket connection is established
             try {
                 session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
                 session.setTextMessageSizeLimit(2 * 1024 * 1024);
                 // TODO decorator session?
                 ConcurrentWebSocketSessionDecorator decorator = new MonitoredWebSocketSession(sessionMetrics, session,
-                        1_000, 16 * 1024,
+                        1_000, 24 * 1024,
                         ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
-                String principal = availableUsernames.get(ThreadLocalRandom.current().nextInt(availableUsernames.size()));
+                String principal = availableUsernames
+                        .get(ThreadLocalRandom.current().nextInt(availableUsernames.size()));
                 session.getAttributes().put("username", principal);
                 session.getAttributes().put("id", UUID.randomUUID());
                 availableUsernames.remove(principal);
@@ -152,7 +158,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
             metrics.onClosedSession();
             broadcastService.unregisterSession(session);
-// Perform actions when a WebSocket connection is closed
+            // Perform actions when a WebSocket connection is closed
         }
     }
 }
