@@ -13,9 +13,9 @@ public interface Messages {
     record OnlineUser(String username) {
     }
 
-    record VideoMessage(MessageType type, String username, List<String> videoStream) {
+    record VideoMessage(MessageType type, String username, String videoStream) {
 
-        public VideoMessage(String username, List<String> videoStream) {
+        public VideoMessage(String username, String videoStream) {
             this(MessageType.VIDEO_FROM_USER, username, videoStream);
         }
     }
@@ -34,7 +34,7 @@ public interface Messages {
         }
     }
 
-    record ContributionMessage(MessageType type, List<String> videoStream) {
+    record ContributionMessage(MessageType type, String videoStream) {
     }
 
     record VideoFeedbackMessage(MessageType type, String username, Emotion emotion) {

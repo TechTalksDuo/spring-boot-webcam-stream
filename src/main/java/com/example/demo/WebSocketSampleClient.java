@@ -77,15 +77,9 @@ public class WebSocketSampleClient implements CommandLineRunner {
 
         while (true) {
             try {
-                List<String> images = Arrays.asList(new String[12]).stream().map(i -> {
-                    try {
-                        return getImage();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList();
+                String image = getImage();
                 session.sendMessage(new TextMessage(toStringValue(
-                        new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, images))));
+                        new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, image))));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -126,15 +120,9 @@ public class WebSocketSampleClient implements CommandLineRunner {
     Runnable sendImageToSession(WebSocketSession session) {
         return () -> {
             try {
-                List<String> images = Arrays.asList(new String[12]).stream().map(i -> {
-                    try {
-                        return getImage();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList();
+                String image = getImage();
                 session.sendMessage(new TextMessage(toStringValue(
-                        new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, images))));
+                        new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, image))));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
