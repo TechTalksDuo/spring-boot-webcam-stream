@@ -90,7 +90,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         }
         @Override
         public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
-            metrics.onMessage();
+            metrics.onMessage(session.getId());
 // Handle incoming messages here
 ////            TODO process async
 //            executorService.submit(() -> {

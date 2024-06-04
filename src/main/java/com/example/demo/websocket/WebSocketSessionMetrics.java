@@ -7,21 +7,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class WebSocketSessionMetrics {
 
-    private final Counter startCount;
-    private final Counter finishCount;
+    private final MeterRegistry meterRegistry;
 
     public WebSocketSessionMetrics(MeterRegistry meterRegistry) {
-        startCount = Counter.builder("websocket.session.send.start.count")
-                .register(meterRegistry);
-        finishCount = Counter.builder("websocket.session.send.finish.count")
-                .register(meterRegistry);
+        this.meterRegistry = meterRegistry;
     }
 
     void startCount() {
-        startCount.increment();
+        Counter.builder("websocket.session.send.start.count")
+                .tags("thread", Thread.currentThread().getName())
+                .register(meterRegistry)
+                .increment();
     }
 
     void finishCount() {
-        finishCount.increment();
+        Counter.builder("websocket.session.send.finish.count")
+                .tags("thread", Thread.currentThread().getName())
+                .register(meterRegistry)
+                .increment();
     }
 }

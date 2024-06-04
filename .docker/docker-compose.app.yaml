@@ -9,14 +9,14 @@ services:
       - 80:8080
     command: bash -c "java -XX:MinRAMPercentage=50.0 -Djdk.tracePinnedThreads=full -XX:MaxRAMPercentage=90.0 -XshowSettings:full -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/home/jfr/heap_dump.hprof -XX:StartFlightRecording=delay=10s,maxsize=1g,disk=true,dumponexit=true,filename=/home/jfr/latest.jfr -jar /home/app/demo-0.0.1-SNAPSHOT.jar --websocket.input.dir=/home/input --websocket.target.port=8080 --websocket.target.host=app"
     environment:
-#      - DEBUG=false
-#      - SERVER_PORT=8080
-#      - SERVER_SSL_ENABLED=false
-      - SERVER_PORT=8443
-      - SERVER_SSL_ENABLED=true
-      - SERVER_SSL_BUNDLE=server
-      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_CERTIFICATE=file:///home/certs/fullchain.pem
-      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_PRIVATE_KEY=file:///home/certs/privkey.pem
+      - DEBUG=false
+      - SERVER_PORT=8080
+      - SERVER_SSL_ENABLED=false
+#      - SERVER_PORT=8443
+#      - SERVER_SSL_ENABLED=true
+#      - SERVER_SSL_BUNDLE=server
+#      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_CERTIFICATE=file:///home/certs/fullchain.pem
+#      - SPRING_SSL_BUNDLE_PEM_SERVER_KEYSTORE_PRIVATE_KEY=file:///home/certs/privkey.pem
       - LLM_HOST=face-emotion-api
       - OLLAMA_ENABLED=true
       - OLLAMA_HOST=ollama
