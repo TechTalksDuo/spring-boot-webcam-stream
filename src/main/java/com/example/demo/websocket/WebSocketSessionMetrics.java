@@ -13,16 +13,18 @@ public class WebSocketSessionMetrics {
         this.meterRegistry = meterRegistry;
     }
 
-    void startCount() {
+    void startCount(String sessionId) {
         Counter.builder("websocket.session.send.start.count")
                 .tags("thread", Thread.currentThread().getName())
+                .tags("sessionId", sessionId)
                 .register(meterRegistry)
                 .increment();
     }
 
-    void finishCount() {
+    void finishCount(String sessionId) {
         Counter.builder("websocket.session.send.finish.count")
                 .tags("thread", Thread.currentThread().getName())
+                .tags("sessionId", sessionId)
                 .register(meterRegistry)
                 .increment();
     }

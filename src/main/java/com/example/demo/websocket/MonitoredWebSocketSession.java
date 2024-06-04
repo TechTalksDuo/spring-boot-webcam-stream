@@ -18,11 +18,12 @@ public class MonitoredWebSocketSession extends ConcurrentWebSocketSessionDecorat
 
     @Override
     public void sendMessage(WebSocketMessage<?> message) throws IOException {
+        String username = (String) getDelegate().getAttributes().get("username");
         try {
-            metrics.startCount();
+            metrics.startCount(username);
             super.sendMessage(message);
         } finally {
-            metrics.finishCount();
+            metrics.finishCount(username);
         }
     }
 }
