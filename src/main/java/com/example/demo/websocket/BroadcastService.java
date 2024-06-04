@@ -34,23 +34,24 @@ public class BroadcastService {
     private static final Logger log = LoggerFactory.getLogger(BroadcastService.class);
     @Autowired
     ObjectMapper mapper;
-//    @Autowired
-//    OllamaClient client;
+    // @Autowired
+    // OllamaClient client;
     @Autowired
     LLMClient client;
-//    private final ExecutorService executorService = ForkJoinPool.commonPool();
-//   private final ExecutorService executorService = Executors.newFixedThreadPool(64);
-     private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
-//    private final ExecutorService executorService = Executors.newWorkStealingPool();
+    // private final ExecutorService executorService = ForkJoinPool.commonPool();
+    // private final ExecutorService executorService =
+    // Executors.newFixedThreadPool(64);
+    private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+    // private final ExecutorService executorService =
+    // Executors.newWorkStealingPool();
     private final Map<String, WebSocketSession> allSessions = new ConcurrentHashMap<>();
     private final BackpressureSamplingService samplingService;
     private final String prompt;
     private final boolean ollamaEnabled;
 
     public BroadcastService(BackpressureSamplingService samplingService,
-                            @Value("${ollama.prompt.file}") String promptPath,
-                            @Value("${ollama.enabled}") boolean ollamaEnabled
-                            ) throws IOException {
+            @Value("${ollama.prompt.file}") String promptPath,
+            @Value("${ollama.enabled}") boolean ollamaEnabled) throws IOException {
         this.samplingService = samplingService;
         this.ollamaEnabled = ollamaEnabled;
         this.prompt = Files.readString(ResourceUtils.getFile(promptPath).toPath());
@@ -60,7 +61,8 @@ public class BroadcastService {
     @Timed
     public List<Messages.OnlineUser> registerSession(WebSocketSession session) {
         allSessions.put(session.getId(), session);
-        byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get("username"), true, allSessions.size()));
+        byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get("username"),
+                true, allSessions.size()));
         TextMessage message = new TextMessage(payload);
         sendAll(message, session);
         return getActiveUsers();
@@ -76,9 +78,10 @@ public class BroadcastService {
     @Timed
     public void unregisterSession(WebSocketSession session) {
         WebSocketSession removed = allSessions.remove(session.getId());
-            byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get("username"), false, allSessions.size()));
-            TextMessage message = new TextMessage(payload);
-            sendAll(message, session);
+        byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get("username"),
+                false, allSessions.size()));
+        TextMessage message = new TextMessage(payload);
+        sendAll(message, session);
     }
 
     @Timed
@@ -86,8 +89,7 @@ public class BroadcastService {
         if (contribution.type() == Messages.MessageType.VIDEO_STOPPED) {
 
             Messages.VideoStoppedMessage update = new Messages.VideoStoppedMessage(
-                    (String) senderSession.getAttributes().get("username")
-            );
+                    (String) senderSession.getAttributes().get("username"));
             byte[] payload = toStringValue(update);
             TextMessage message = new TextMessage(payload);
             return sendAll(message, senderSession);
@@ -96,16 +98,15 @@ public class BroadcastService {
         var id = (UUID) senderSession.getAttributes().get("id");
         if (ollamaEnabled) {
             samplingService.sample(id, () -> {
-                String base64 = contribution.videoStream().substring(contribution.videoStream().lastIndexOf(",") + 1);
+                String base64 = contribution.videoStream().get(0)
+                        .substring(contribution.videoStream().get(0).lastIndexOf(",") + 1);
                 var answer = client.ask(base64);
-//                String answer = client.ask(prompt,
-//                        base64);
+                // String answer = client.ask(prompt, base64);
 
                 log.info("Got answer: {}", answer);
                 Messages.VideoFeedbackMessage update = new Messages.VideoFeedbackMessage(
                         (String) senderSession.getAttributes().get("username"),
-                        answer
-                );
+                        answer);
                 byte[] payload = toStringValue(update);
                 TextMessage message = new TextMessage(payload);
                 sendAll(message)
@@ -115,8 +116,7 @@ public class BroadcastService {
 
         Messages.VideoMessage update = new Messages.VideoMessage(
                 (String) senderSession.getAttributes().get("username"),
-                contribution.videoStream()
-        );
+                contribution.videoStream());
         byte[] payload = toStringValue(update);
         TextMessage message = new TextMessage(payload);
         return sendAll(message, senderSession);
@@ -125,85 +125,88 @@ public class BroadcastService {
     private CompletableFuture sendAll(TextMessage message) {
         return sendAll(message, null);
     }
+
     private CompletableFuture sendAll(TextMessage message, WebSocketSession senderSessionToSkip) {
-//        TODO send sequentially
-//        allSessions.forEach(session -> {
-//                    try {
-//                        if ( senderSessionToSkip == null || !senderSessionToSkip.getId().equals(session.getId())) {
-//                            if (session.isOpen())
-//                                session.sendMessage(message);
-//                            else
-//                                unregisterSession(session);
-//                        }
-//                    } catch (IOException | SessionLimitExceededException e) {
-//                        log.warn("send - error", e);
-//                        // TODO remove session from list
-//                    }
-//                }
-//        );
-//        return CompletableFuture.completedFuture(null);
-//        TODO try in parallel OOM killed after 10 rate with 10 instances
+        // TODO send sequentially
+        // allSessions.forEach(session -> {
+        // try {
+        // if ( senderSessionToSkip == null ||
+        // !senderSessionToSkip.getId().equals(session.getId())) {
+        // if (session.isOpen())
+        // session.sendMessage(message);
+        // else
+        // unregisterSession(session);
+        // }
+        // } catch (IOException | SessionLimitExceededException e) {
+        // log.warn("send - error", e);
+        // // TODO remove session from list
+        // }
+        // }
+        // );
+        // return CompletableFuture.completedFuture(null);
+        // TODO try in parallel OOM killed after 10 rate with 10 instances
         allSessions.entrySet().stream().forEach(k -> {
-                    var session = k.getValue();
-                    if (senderSessionToSkip == null || !senderSessionToSkip.equals(session) ) {
-                        executorService.submit(() -> {
-                            try {
-                                session.sendMessage(message);
-                                return session;
-                            } catch (IOException e) {
-                                log.warn("send - error", e);
-                                // TODO remove session from list
-                                try {
-                                    session.close(CloseStatus.SERVER_ERROR);
-                                } catch (IOException ex) {
-                                    log.warn("can't close session: {}", session, ex);
-                                }
-                                unregisterSession(session);
-                                return session;
-                            }
-                        });
+            var session = k.getValue();
+            if (senderSessionToSkip == null || !senderSessionToSkip.equals(session)) {
+                executorService.submit(() -> {
+                    try {
+                        session.sendMessage(message);
+                        return session;
+                    } catch (IOException e) {
+                        log.warn("send - error", e);
+                        // TODO remove session from list
+                        try {
+                            session.close(CloseStatus.SERVER_ERROR);
+                        } catch (IOException ex) {
+                            log.warn("can't close session: {}", session, ex);
+                        }
+                        unregisterSession(session);
+                        return session;
                     }
                 });
+            }
+        });
         return CompletableFuture.completedFuture(null);
-//                CompletableFuture.supplyAsync(() -> {
-//                            try {
-////                                log.info("sendAll broadcast to: {}", session.getId());
-//                                session.sendMessage(message);
-//                                return session;
-//                            } catch (IOException e) {
-//                                log.warn("send - error", e);
-//                                // TODO remove session from list
-//                                try {
-//                                    session.close(CloseStatus.SERVER_ERROR);
-//                                } catch (IOException ex) {
-//                                    log.warn("can't close session: {}", session, ex);
-//                                }
-//                                unregisterSession(session);
-//                                return session;
-//                            }
-//                        }, executorService)
-//        ).toList();
-//        return CompletableFuture.allOf();
-//        return CompletableFuture.allOf(all.toArray(new CompletableFuture[]{}));// TODO OOM
+        // CompletableFuture.supplyAsync(() -> {
+        // try {
+        //// log.info("sendAll broadcast to: {}", session.getId());
+        // session.sendMessage(message);
+        // return session;
+        // } catch (IOException e) {
+        // log.warn("send - error", e);
+        // // TODO remove session from list
+        // try {
+        // session.close(CloseStatus.SERVER_ERROR);
+        // } catch (IOException ex) {
+        // log.warn("can't close session: {}", session, ex);
+        // }
+        // unregisterSession(session);
+        // return session;
+        // }
+        // }, executorService)
+        // ).toList();
+        // return CompletableFuture.allOf();
+        // return CompletableFuture.allOf(all.toArray(new CompletableFuture[]{}));//
+        // TODO OOM
 
-//        TODO send per thread
-//        allSessions.forEach((k, v) -> {
-//                    try {
-//                        if ( senderSessionToSkip == null || !senderSessionToSkip.getId().equals(v.getId())) {
-//                            if (v.isOpen())
-//                                v.sendMessage(message);
-//                            else
-//                                unregisterSession(v);
-//                        }
-//                    } catch (SessionLimitExceededException | IOException e) {
-//                        log.warn("send - error", e);
-//                        // TODO remove session from list
-//                    }
-//                }
-//        );
-//        return CompletableFuture.completedFuture(null);
+        // TODO send per thread
+        // allSessions.forEach((k, v) -> {
+        // try {
+        // if ( senderSessionToSkip == null ||
+        // !senderSessionToSkip.getId().equals(v.getId())) {
+        // if (v.isOpen())
+        // v.sendMessage(message);
+        // else
+        // unregisterSession(v);
+        // }
+        // } catch (SessionLimitExceededException | IOException e) {
+        // log.warn("send - error", e);
+        // // TODO remove session from list
+        // }
+        // }
+        // );
+        // return CompletableFuture.completedFuture(null);
     }
-
 
     private byte[] toStringValue(Object payload) {
         try {

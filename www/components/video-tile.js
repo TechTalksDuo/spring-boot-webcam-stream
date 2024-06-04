@@ -5,6 +5,8 @@ import { getRandomColor } from "../utils/color.js";
 import { WebSocketState, WebSocketEvent, WebSocketEventType } from "../events/websocket.js";
 
 class VideoTile extends LitElement {
+  #frameRate = 12;
+
   constructor() {
     super();
 
@@ -87,9 +89,15 @@ class VideoTile extends LitElement {
   }
 
   #showIncomingImage(videoStream) {
-    const img = this.shadowRoot.querySelector("img");
-    URL.revokeObjectURL(img.src);
-    img.src = URL.createObjectURL(this.#dataURItoBlob(videoStream));
+    const interval = setInterval(() => {
+      if (!videoStream.length || !this.isStreaming) clearInterval(interval);
+      const img = this.shadowRoot.querySelector("img");
+      URL.revokeObjectURL(img.src);
+      img.src = URL.createObjectURL(this.#dataURItoBlob(videoStream.shift()));
+    }, 1000 / this.#frameRate);
+    // const img = this.shadowRoot.querySelector("img");
+    // URL.revokeObjectURL(img.src);
+    // img.src = URL.createObjectURL(this.#dataURItoBlob(videoStream));
   }
 
   #clearIncomingImage() {

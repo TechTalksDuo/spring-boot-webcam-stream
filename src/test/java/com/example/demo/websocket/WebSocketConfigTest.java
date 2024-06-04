@@ -14,18 +14,19 @@ import org.springframework.web.socket.client.WebSocketClient;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "client.mode=true",
         "websocket.input.dir=file://${PWD}/src/test/resources/input_small",
-                "websocket.rateMillis=1000",
-                "websocket.target.port=${server.port}",
-        })
+        "websocket.rateMillis=1000",
+        "websocket.target.port=${server.port}",
+})
 class WebSocketConfigTest {
 
     @LocalServerPort
@@ -42,16 +43,22 @@ class WebSocketConfigTest {
     void test() throws IOException, InterruptedException {
 
         var random = ThreadLocalRandom.current().nextInt(availableImages.length);
-        String image = Base64.getEncoder().encodeToString(Files.readAllBytes(availableImages[random].toPath()));
+        List<String> images = Arrays.asList(new String[12]).stream().map(i -> {
+            try {
+                return Base64.getEncoder().encodeToString(Files.readAllBytes(availableImages[random].toPath()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).toList();
 
         client.execute(new SampleWebSocketHandler(message -> {
-                    // TODO change rate
-                }), "ws://localhost:" + port+ "/websocket")
+            // TODO change rate
+        }), "ws://localhost:" + port + "/websocket")
                 .thenApply(session -> {
 
                     try {
                         session.sendMessage(new TextMessage(toStringValue(
-                                new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, image))));
+                                new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, images))));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -66,8 +73,7 @@ class WebSocketConfigTest {
                         }
                     }
                     return null;
-                })
-                ;
+                });
 
         Thread.sleep(20000L);
     }
