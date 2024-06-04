@@ -17,7 +17,6 @@ import java.util.Map;
 @Service
 public class LLMClient {
 
-
     public final Map<String, String> DICTIONARY;
 
     @Value("${llm.host:localhost}")
@@ -33,15 +32,15 @@ public class LLMClient {
         DICTIONARY.put("use_amused", "😄");
         DICTIONARY.put("use_angry", "😤");
         DICTIONARY.put("use_annoyed", "😠");
-        DICTIONARY.put("use_ashamed", "🫣");
+        DICTIONARY.put("use_ashamed", "😳");
         DICTIONARY.put("use_bored", "🥱");
         DICTIONARY.put("use_calm", "😌");
-        DICTIONARY.put("use_confused", "😑");
-        DICTIONARY.put("use_desiring", "🥹");
-        DICTIONARY.put("use_disappointed", "🤕");
+        DICTIONARY.put("use_confused", "😕");
+        DICTIONARY.put("use_desiring", "😏");
+        DICTIONARY.put("use_disappointed", "😞");
         DICTIONARY.put("use_disgusted", "🤢");
-        DICTIONARY.put("use_distressed", "🫤");
-        DICTIONARY.put("use_doubtful", "🤥");
+        DICTIONARY.put("use_distressed", "😩");
+        DICTIONARY.put("use_doubtful", "🤨");
         DICTIONARY.put("use_embarrassed", "😬");
         DICTIONARY.put("use_excited", "🤩");
         DICTIONARY.put("use_furious", "😤");
@@ -51,24 +50,24 @@ public class LLMClient {
         DICTIONARY.put("use_pleased", "😎");
         DICTIONARY.put("use_proud", "🤠");
         DICTIONARY.put("use_sad", "🙁");
-        DICTIONARY.put("use_scared", "😭");
+        DICTIONARY.put("use_scared", "😨");
         DICTIONARY.put("use_sleepy", "😴");
-        DICTIONARY.put("use_surprised", "🙄");
+        DICTIONARY.put("use_surprised", "😮");
         DICTIONARY.put("use_terrified", "😱");
-        DICTIONARY.put("use_thoughtful", "🙃");
+        DICTIONARY.put("use_thoughtful", "🤔");
         DICTIONARY.put("use_tired", "😫");
-        DICTIONARY.put("use_victorious", "😊");
+        DICTIONARY.put("use_victorious", "😁");
         DICTIONARY.put("use_worried", "😧");
     }
-
 
     @Timed
     public Messages.Emotion ask(String base64Image) {
         List<LLMResponse> body = restTemplate
                 .exchange("http://%s:%d/api/analyze".formatted(host, port),
                         HttpMethod.POST,
-                        new HttpEntity<>(new LLMRequest(base64Image
-                )), new ParameterizedTypeReference<List<LLMResponse>>(){})
+                        new HttpEntity<>(new LLMRequest(base64Image)),
+                        new ParameterizedTypeReference<List<LLMResponse>>() {
+                        })
                 .getBody();
         var item = body.get(0);
         return new Messages.Emotion(item.label, DICTIONARY.get(item.label), item.score);
@@ -77,6 +76,7 @@ public class LLMClient {
 
     record LLMRequest(String image) {
     }
+
     record LLMResponse(String label, double score) {
 
     }
