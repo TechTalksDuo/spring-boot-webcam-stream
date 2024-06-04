@@ -122,8 +122,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
             try {
                 session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
                 session.setTextMessageSizeLimit(2 * 1024 * 1024);
-//                TODO decorator session?
-                ConcurrentWebSocketSessionDecorator decorator = new MonitoredWebSocketSession(sessionMetrics, session, 1_000, 16 * 1024,
+                // TODO decorator session?
+                ConcurrentWebSocketSessionDecorator decorator = new MonitoredWebSocketSession(sessionMetrics, session,
+                        1_000, 196 * 1024,
                         ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
                 String principal = availableUsernames.get(ThreadLocalRandom.current().nextInt(availableUsernames.size()));
                 session.getAttributes().put("username", principal);

@@ -100,7 +100,8 @@ public class BroadcastService {
         var id = (UUID) senderSession.getAttributes().get("id");
         if (ollamaEnabled) {
             samplingService.sample(id, () -> {
-                String base64 = contribution.videoStream().substring(contribution.videoStream().lastIndexOf(",") + 1);
+                String base64 = contribution.videoStream().get(0)
+                        .substring(contribution.videoStream().get(0).lastIndexOf(",") + 1);
                 var answer = client.ask(base64);
 //                String answer = client.ask(prompt,
 //                        base64);

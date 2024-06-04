@@ -9,6 +9,7 @@ class VideoSource extends LitElement {
   #localVideoStream;
   #videoQuality = 0.7;
   #videoUpdateInterval;
+  #frameRate = 12;
 
   constructor() {
     super();
@@ -169,6 +170,7 @@ class VideoSource extends LitElement {
   #streamVideo(video, localVideoStream) {
     const snapshotCanvas = document.createElement("canvas");
     const { width, height } = localVideoStream.getVideoTracks()[0].getSettings();
+    let buffer = [];
     snapshotCanvas.width = width;
     snapshotCanvas.height = height;
 
@@ -176,8 +178,13 @@ class VideoSource extends LitElement {
       snapshotCanvas.getContext("2d").clearRect(0, 0, width, height);
       snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
       const encodedData = snapshotCanvas.toDataURL("image/jpeg", this.#videoQuality);
-      WebSocketState?.send({ videoStream: encodedData });
-    }, 1000 / 12);
+      buffer.push(encodedData);
+      if (buffer.length >= this.#frameRate) {
+        WebSocketState?.send({ videoStream: buffer });
+        buffer = [];
+      }
+      // WebSocketState?.send({ videoStream: encodedData });
+    }, 1000 / this.#frameRate);
   }
 }
 

@@ -5,6 +5,9 @@ import { getRandomColor } from "../utils/color.js";
 import { WebSocketState, WebSocketEvent, WebSocketEventType } from "../events/websocket.js";
 
 class VideoTile extends LitElement {
+  #frameRate = 12;
+  #incomingMessageInterval;
+
   constructor() {
     super();
 
@@ -87,9 +90,20 @@ class VideoTile extends LitElement {
   }
 
   #showIncomingImage(videoStream) {
-    const img = this.shadowRoot.querySelector("img");
-    URL.revokeObjectURL(img.src);
-    img.src = URL.createObjectURL(this.#dataURItoBlob(videoStream));
+    if (this.#incomingMessageInterval) clearInterval(this.#incomingMessageInterval);
+
+    this.#incomingMessageInterval = setInterval(() => {
+      if (!videoStream.length || !this.isStreaming) clearInterval(this.#incomingMessageInterval);
+      const img = this.shadowRoot.querySelector("img");
+      const blob = this.#dataURItoBlob(videoStream.shift());
+      if (blob) {
+        URL.revokeObjectURL(img.src);
+        img.src = URL.createObjectURL(blob);
+      }
+    }, 1000 / this.#frameRate);
+    // const img = this.shadowRoot.querySelector("img");
+    // URL.revokeObjectURL(img.src);
+    // img.src = URL.createObjectURL(this.#dataURItoBlob(videoStream));
   }
 
   #clearIncomingImage() {
@@ -99,6 +113,7 @@ class VideoTile extends LitElement {
   }
 
   #dataURItoBlob(dataURI) {
+    if (!dataURI) return null;
     const byteString = atob(dataURI.split(",")[1]);
     const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
     const arrayBuffer = new ArrayBuffer(byteString.length);

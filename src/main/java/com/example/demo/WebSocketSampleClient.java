@@ -1,6 +1,5 @@
 package com.example.demo;
 
-
 import com.example.demo.websocket.ExistOnCloseWebSocketHandler;
 import com.example.demo.websocket.Messages;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,11 +41,10 @@ public class WebSocketSampleClient implements CommandLineRunner {
     private final AtomicReference<ScheduledFuture<?>> scheduledFuture = new AtomicReference<>();
 
     public WebSocketSampleClient(WebSocketClient client, List<File> availableImages,
-                                 @Value("${websocket.protocol:ws}") String protocol,
-                                 @Value("${websocket.rateMillis}") int rateMillis,
-                                 @Value("${websocket.target.port}") int port,
-                                 @Value("${websocket.target.host:localhost}") String host, ObjectMapper mapper
-    ) {
+            @Value("${websocket.protocol:ws}") String protocol,
+            @Value("${websocket.rateMillis}") int rateMillis,
+            @Value("${websocket.target.port}") int port,
+            @Value("${websocket.target.host:localhost}") String host, ObjectMapper mapper) {
         this.client = client;
         this.protocol = protocol;
         this.rateMillis = rateMillis;
@@ -75,14 +73,19 @@ public class WebSocketSampleClient implements CommandLineRunner {
         WebSocketSession session = client.execute(new ExistOnCloseWebSocketHandler(
                 message -> {
 
-                }
-        ), protocol + "://" + host + ":" + port + "/websocket").get();
+                }), protocol + "://" + host + ":" + port + "/websocket").get();
 
         while (true) {
             try {
-                String image = getImage();
+                List<String> images = Arrays.asList(new String[12]).stream().map(i -> {
+                    try {
+                        return getImage();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList();
                 session.sendMessage(new TextMessage(toStringValue(
-                        new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, image))));
+                        new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, images))));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -90,40 +93,48 @@ public class WebSocketSampleClient implements CommandLineRunner {
         }
     }
 
-//    @Override
-//    public void run(String... args) throws Exception {
-//
-//        client.execute(new ExistOnCloseWebSocketHandler(
-//                        message -> {
-//                            // TODO change rate
-////                            if (message.equals("something") && scheduledFuture.get() != null) {
-////                                scheduledFuture.get().cancel(true);
-////                                scheduledFuture.set(scheduledService.scheduleAtFixedRate(sendImageToSession(message.session()), 0, 500, TimeUnit.MILLISECONDS));
-////                            }
-//                        }
-//                ), protocol + "://" + host + ":" + port + "/websocket")
-//                .thenApply(session -> {
-//                    scheduledFuture.set(scheduledService.scheduleAtFixedRate(sendImageToSession(session), 0, rateMillis, TimeUnit.MILLISECONDS));
-//                    return session;
-//                })
-//                .handle((session, ex) -> {
-//                    if (ex != null) {
-//                        try {
-//                            session.close(CloseStatus.SERVER_ERROR);
-//                        } catch (IOException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                    }
-//                    return null;
-//                });
-//    }
+    // @Override
+    // public void run(String... args) throws Exception {
+    //
+    // client.execute(new ExistOnCloseWebSocketHandler(
+    // message -> {
+    // // TODO change rate
+    //// if (message.equals("something") && scheduledFuture.get() != null) {
+    //// scheduledFuture.get().cancel(true);
+    //// scheduledFuture.set(scheduledService.scheduleAtFixedRate(sendImageToSession(message.session()),
+    // 0, 500, TimeUnit.MILLISECONDS));
+    //// }
+    // }
+    // ), protocol + "://" + host + ":" + port + "/websocket")
+    // .thenApply(session -> {
+    // scheduledFuture.set(scheduledService.scheduleAtFixedRate(sendImageToSession(session),
+    // 0, rateMillis, TimeUnit.MILLISECONDS));
+    // return session;
+    // })
+    // .handle((session, ex) -> {
+    // if (ex != null) {
+    // try {
+    // session.close(CloseStatus.SERVER_ERROR);
+    // } catch (IOException e) {
+    // throw new RuntimeException(e);
+    // }
+    // }
+    // return null;
+    // });
+    // }
 
     Runnable sendImageToSession(WebSocketSession session) {
         return () -> {
             try {
-                String image = getImage();
+                List<String> images = Arrays.asList(new String[12]).stream().map(i -> {
+                    try {
+                        return getImage();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList();
                 session.sendMessage(new TextMessage(toStringValue(
-                        new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, image))));
+                        new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, images))));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
