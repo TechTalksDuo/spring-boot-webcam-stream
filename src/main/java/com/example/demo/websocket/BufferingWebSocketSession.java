@@ -19,11 +19,12 @@ public class BufferingWebSocketSession {
     private static final Logger log = getLogger(BufferingWebSocketSession.class);
     private final WebSocketSession delegate;
     private final LinkedBlockingQueue<TimedTextMessage> buffer = new LinkedBlockingQueue<>();
-    private static final ExecutorService executorService = Executors.newThreadPerTaskExecutor(
-            Thread.ofVirtual()
-                    .name("per-session-virtual-threads")
-                    .factory()
-    );
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(64);
+//    private static final ExecutorService executorService = Executors.newThreadPerTaskExecutor(
+//            Thread.ofVirtual()
+//                    .name("per-session-virtual-threads")
+//                    .factory()
+//    );
     private Future<?> future;
 
     public BufferingWebSocketSession(WebSocketSession delegate) {
