@@ -125,7 +125,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -204,7 +204,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -289,7 +289,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -382,7 +382,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -492,7 +492,7 @@
           "expr": "rate(websocket_messages_count_total[$__interval])",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "requests",
+          "legendFormat": "{{sessionId}}",
           "metric": "",
           "range": true,
           "refId": "A",
@@ -844,10 +844,10 @@
             "type": "prometheus"
           },
           "editorMode": "code",
-          "expr": "websocket_session_send_thread_start_count_total -  websocket_session_send_thread_finish_count_total",
+          "expr": "websocket_session_send_start_count_total -  websocket_session_send_finish_count_total",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "{{thread}}",
+          "legendFormat": "__auto",
           "metric": "",
           "range": true,
           "refId": "A",
@@ -1080,6 +1080,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -1091,7 +1092,7 @@
             "type": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(websocket_session_send_start_count_total[$__interval])",
+          "expr": "sum(websocket_session_send_start_count_total) by (sessionId) - sum(websocket_session_send_finish_count_total) by (sessionId)",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "__auto",
@@ -1105,18 +1106,18 @@
             "type": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(websocket_session_send_finish_count_total[$__interval])",
+          "expr": "sum(rate(websocket_session_send_finish_count_total[$__interval])) by (sessionId)",
           "format": "time_series",
-          "hide": false,
+          "hide": true,
           "intervalFactor": 2,
-          "legendFormat": "__auto",
+          "legendFormat": "{{sessionId}} finished",
           "metric": "",
           "range": true,
           "refId": "B",
           "step": 2400
         }
       ],
-      "title": "Send messages",
+      "title": "Delayed messages",
       "type": "timeseries"
     },
     {
@@ -1860,8 +1861,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1984,8 +1984,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -2104,8 +2103,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -2241,8 +2239,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -3832,6 +3829,7 @@
     "from": "now-5m",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {
     "now": true,
     "refresh_intervals": [
@@ -3861,6 +3859,6 @@
   "timezone": "browser",
   "title": "Spring Boot Micrometer",
   "uid": "2HVL3NRiz",
-  "version": 5,
+  "version": 4,
   "weekStart": ""
 }
