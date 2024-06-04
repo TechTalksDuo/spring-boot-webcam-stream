@@ -26,9 +26,9 @@ public class WebSocketMetrics {
     void onClosedSession() {
         closedSessionCounter.increment();
     }
-    void onMessage(String sessionId) {
+    void onMessage(String principal) {
         Counter.builder("websocket.messages.count")
-                .tags("sessionId", sessionId)
+                .tags("sessionId", principal)
                 .register(meterRegistry)
                 .increment();
     }
