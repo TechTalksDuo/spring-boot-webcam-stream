@@ -15,6 +15,7 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
+import org.springframework.web.socket.handler.WebSocketSessionDecorator;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 import java.io.IOException;
@@ -128,7 +129,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
                 session.setTextMessageSizeLimit(2 * 1024 * 1024);
                 // TODO decorator session?
-                ConcurrentWebSocketSessionDecorator decorator = new MonitoredWebSocketSession(sessionMetrics, session,
+                WebSocketSessionDecorator decorator = new MonitoredWebSocketSession(sessionMetrics, session,
                         1_000, 24 * 1024,
                         ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
                 String principal = availableUsernames
