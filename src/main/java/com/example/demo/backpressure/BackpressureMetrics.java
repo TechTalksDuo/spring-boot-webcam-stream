@@ -2,15 +2,7 @@ package com.example.demo.backpressure;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.*;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
 public class BackpressureMetrics {
@@ -40,6 +32,7 @@ public class BackpressureMetrics {
     void onRequest() {
         requestCounter.increment();
     }
+
     void onSubmit() {
         submitCounter.increment();
     }

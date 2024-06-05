@@ -1,7 +1,6 @@
 package com.example.demo.websocket;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -9,7 +8,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.concurrent.CountDownLatch;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;

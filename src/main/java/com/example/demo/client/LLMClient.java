@@ -9,7 +9,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,7 @@ import java.util.Map;
 @Service
 public class LLMClient {
 
-    public final Map<String, String> DICTIONARY;
+    public final Map<String, String> dictionary;
 
     @Value("${llm.host:localhost}")
     String host;
@@ -27,37 +26,37 @@ public class LLMClient {
 
     public LLMClient() {
         this.restTemplate = new RestTemplate();
-        DICTIONARY = new HashMap<>();
-        DICTIONARY.put("use_amazed", "😲");
-        DICTIONARY.put("use_amused", "😄");
-        DICTIONARY.put("use_angry", "😤");
-        DICTIONARY.put("use_annoyed", "😠");
-        DICTIONARY.put("use_ashamed", "😳");
-        DICTIONARY.put("use_bored", "🥱");
-        DICTIONARY.put("use_calm", "😌");
-        DICTIONARY.put("use_confused", "😕");
-        DICTIONARY.put("use_desiring", "😏");
-        DICTIONARY.put("use_disappointed", "😞");
-        DICTIONARY.put("use_disgusted", "🤢");
-        DICTIONARY.put("use_distressed", "😩");
-        DICTIONARY.put("use_doubtful", "🤨");
-        DICTIONARY.put("use_embarrassed", "😬");
-        DICTIONARY.put("use_excited", "🤩");
-        DICTIONARY.put("use_furious", "😤");
-        DICTIONARY.put("use_happy", "😀");
-        DICTIONARY.put("use_loved", "😍");
-        DICTIONARY.put("use_melancholic", "🥴");
-        DICTIONARY.put("use_pleased", "😎");
-        DICTIONARY.put("use_proud", "🤠");
-        DICTIONARY.put("use_sad", "🙁");
-        DICTIONARY.put("use_scared", "😨");
-        DICTIONARY.put("use_sleepy", "😴");
-        DICTIONARY.put("use_surprised", "😮");
-        DICTIONARY.put("use_terrified", "😱");
-        DICTIONARY.put("use_thoughtful", "🤔");
-        DICTIONARY.put("use_tired", "😫");
-        DICTIONARY.put("use_victorious", "😁");
-        DICTIONARY.put("use_worried", "😧");
+        dictionary = new HashMap<>();
+        dictionary.put("use_amazed", "😲");
+        dictionary.put("use_amused", "😄");
+        dictionary.put("use_angry", "😤");
+        dictionary.put("use_annoyed", "😠");
+        dictionary.put("use_ashamed", "😳");
+        dictionary.put("use_bored", "🥱");
+        dictionary.put("use_calm", "😌");
+        dictionary.put("use_confused", "😕");
+        dictionary.put("use_desiring", "😏");
+        dictionary.put("use_disappointed", "😞");
+        dictionary.put("use_disgusted", "🤢");
+        dictionary.put("use_distressed", "😩");
+        dictionary.put("use_doubtful", "🤨");
+        dictionary.put("use_embarrassed", "😬");
+        dictionary.put("use_excited", "🤩");
+        dictionary.put("use_furious", "😤");
+        dictionary.put("use_happy", "😀");
+        dictionary.put("use_loved", "😍");
+        dictionary.put("use_melancholic", "🥴");
+        dictionary.put("use_pleased", "😎");
+        dictionary.put("use_proud", "🤠");
+        dictionary.put("use_sad", "🙁");
+        dictionary.put("use_scared", "😨");
+        dictionary.put("use_sleepy", "😴");
+        dictionary.put("use_surprised", "😮");
+        dictionary.put("use_terrified", "😱");
+        dictionary.put("use_thoughtful", "🤔");
+        dictionary.put("use_tired", "😫");
+        dictionary.put("use_victorious", "😁");
+        dictionary.put("use_worried", "😧");
     }
 
     @Timed
@@ -69,8 +68,8 @@ public class LLMClient {
                         new ParameterizedTypeReference<List<LLMResponse>>() {
                         })
                 .getBody();
-        var item = body.get(0);
-        return new Messages.Emotion(item.label, DICTIONARY.get(item.label), item.score);
+        var item = body != null ? body.get(0) : new LLMResponse("use_happy", 0.0);
+        return new Messages.Emotion(item.label, dictionary.get(item.label), item.score);
 
     }
 

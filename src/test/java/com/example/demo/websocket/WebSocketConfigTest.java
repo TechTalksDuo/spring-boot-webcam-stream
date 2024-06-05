@@ -1,6 +1,5 @@
 package com.example.demo.websocket;
 
-import com.example.demo.ClientModeConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -14,12 +13,8 @@ import org.springframework.web.socket.client.WebSocketClient;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "client.mode=true",
@@ -46,7 +41,6 @@ class WebSocketConfigTest {
         String image = Base64.getEncoder().encodeToString(Files.readAllBytes(availableImages[random].toPath()));
 
         client.execute(new SampleWebSocketHandler(message -> {
-            // TODO change rate
         }), "ws://localhost:" + port + "/websocket")
                 .thenApply(session -> {
 
