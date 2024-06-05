@@ -1,30 +1,19 @@
 package com.example.demo.websocket;
 
-import org.slf4j.Logger;
+import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class BufferingWebSocketSession {
-    private static final Logger log = getLogger(BufferingWebSocketSession.class);
     private final WebSocketSession delegate;
     private final LinkedBlockingQueue<TimedTextMessage> buffer = new LinkedBlockingQueue<>();
     private static final ExecutorService executorService = Executors.newFixedThreadPool(64);
-//    private static final ExecutorService executorService = Executors.newThreadPerTaskExecutor(
-//            Thread.ofVirtual()
-//                    .name("per-session-virtual-threads")
-//                    .factory()
-//    );
     private Future<?> future;
 
     public BufferingWebSocketSession(WebSocketSession delegate) {
@@ -53,8 +42,8 @@ public class BufferingWebSocketSession {
                 try {
                     delegate.sendMessage(message.message());
                 } catch (IOException e) {
-                    log.warn("send failed - session: {}, error: {}", delegate.getId(), e);
-//                    throw new RuntimeException(e);
+                    throw new MessageDeliveryException("send failed - session: %s, error: %s".formatted(
+                            delegate.getId(), e));
                 }
             }
         });
@@ -64,5 +53,6 @@ public class BufferingWebSocketSession {
         future.cancel(true);
     }
 
-    public record TimedTextMessage(TextMessage message, LocalDateTime timestamp){}
+    public record TimedTextMessage(TextMessage message, LocalDateTime timestamp) {
+    }
 }

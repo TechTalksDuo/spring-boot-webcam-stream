@@ -7,8 +7,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-
 @Service
 public class HuggingFaceClient {
     @Value("${huggingface.host:api-inference.huggingface.co}")
@@ -28,10 +26,10 @@ public class HuggingFaceClient {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer <TODO_ADD_YOUR_OWN>");
         return restTemplate
-                .postForEntity("https://%s:%d/models/%s".formatted(host, port, model), new HttpEntity<>(new HuggingFaceRequest(
-                        base64Image
-                ), headers
-                        ), String.class)
+                .postForEntity("https://%s:%d/models/%s".formatted(host, port, model),
+                        new HttpEntity<>(new HuggingFaceRequest(
+                                base64Image), headers),
+                        String.class)
                 .getBody();
 
     }

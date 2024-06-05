@@ -2,7 +2,6 @@ package com.example.demo.websocket;
 
 import com.example.demo.backpressure.BackpressureSamplingService;
 import com.example.demo.client.LLMClient;
-import com.example.demo.client.OllamaClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.annotation.Timed;
@@ -10,47 +9,39 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.json.JsonParseException;
+import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 import org.springframework.web.socket.handler.SessionLimitExceededException;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.*;
 
 @Service
 public class BroadcastService {
+    private static final String USERNAME = "username";
     private static final Logger log = LoggerFactory.getLogger(BroadcastService.class);
-    @Autowired
-    ObjectMapper mapper;
-//    @Autowired
-//    OllamaClient client;
-    @Autowired
-    LLMClient client;
-//    private final ExecutorService executorService = ForkJoinPool.commonPool();
-   private final ExecutorService executorService = Executors.newFixedThreadPool(64);
-    // private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
-//    private final ExecutorService executorService = Executors.newWorkStealingPool();
+    private final ObjectMapper mapper;
+    private final LLMClient client;
     private final Map<String, BufferingWebSocketSession> allSessions = new ConcurrentHashMap<>();
     private final BackpressureSamplingService samplingService;
     private final String prompt;
     private final boolean ollamaEnabled;
 
-    public BroadcastService(BackpressureSamplingService samplingService,
-                            @Value("${ollama.prompt.file}") String promptPath,
-                            @Value("${ollama.enabled}") boolean ollamaEnabled
-                            ) throws IOException {
+    @Autowired
+    public BroadcastService(ObjectMapper mapper, LLMClient client, BackpressureSamplingService samplingService,
+            @Value("${ollama.prompt.file}") String promptPath,
+            @Value("${ollama.enabled}") boolean ollamaEnabled) throws IOException {
+        this.mapper = mapper;
+        this.client = client;
         this.samplingService = samplingService;
         this.ollamaEnabled = ollamaEnabled;
         this.prompt = Files.readString(ResourceUtils.getFile(promptPath).toPath());
@@ -60,7 +51,8 @@ public class BroadcastService {
     @Timed
     public List<Messages.OnlineUser> registerSession(WebSocketSession session) {
         allSessions.put(session.getId(), new BufferingWebSocketSession(session));
-        byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get("username"), true, allSessions.size()));
+        byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get(USERNAME),
+                true, allSessions.size()));
         TextMessage message = new TextMessage(payload);
         sendAll(message, session);
         return getActiveUsers();
@@ -69,7 +61,7 @@ public class BroadcastService {
     private List<Messages.OnlineUser> getActiveUsers() {
         return allSessions.entrySet()
                 .stream()
-                .map(s -> new Messages.OnlineUser((String) s.getValue().getDelegate().getAttributes().get("username")))
+                .map(s -> new Messages.OnlineUser((String) s.getValue().getDelegate().getAttributes().get(USERNAME)))
                 .toList();
     }
 
@@ -77,7 +69,8 @@ public class BroadcastService {
     public void unregisterSession(WebSocketSession session) {
         BufferingWebSocketSession removed = allSessions.remove(session.getId());
         try {
-            byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get("username"), false, allSessions.size()));
+            byte[] payload = toStringValue(new Messages.OnlineStatusChange(
+                    (String) session.getAttributes().get(USERNAME), false, allSessions.size()));
             TextMessage message = new TextMessage(payload);
             sendAll(message, session);
         } finally {
@@ -86,12 +79,11 @@ public class BroadcastService {
     }
 
     @Timed
-    public CompletableFuture send(WebSocketSession senderSession, Messages.ContributionMessage contribution) {
+    public CompletableFuture<Object> send(WebSocketSession senderSession, Messages.ContributionMessage contribution) {
         if (contribution.type() == Messages.MessageType.VIDEO_STOPPED) {
 
             Messages.VideoStoppedMessage update = new Messages.VideoStoppedMessage(
-                    (String) senderSession.getAttributes().get("username")
-            );
+                    (String) senderSession.getAttributes().get(USERNAME));
             byte[] payload = toStringValue(update);
             TextMessage message = new TextMessage(payload);
             return sendAll(message, senderSession);
@@ -103,14 +95,11 @@ public class BroadcastService {
                 String base64 = contribution.videoStream()
                         .substring(contribution.videoStream().lastIndexOf(",") + 1);
                 var answer = client.ask(base64);
-//                String answer = client.ask(prompt,
-//                        base64);
 
                 log.info("Got answer: {}", answer);
                 Messages.VideoFeedbackMessage update = new Messages.VideoFeedbackMessage(
-                        (String) senderSession.getAttributes().get("username"),
-                        answer
-                );
+                        (String) senderSession.getAttributes().get(USERNAME),
+                        answer);
                 byte[] payload = toStringValue(update);
                 TextMessage message = new TextMessage(payload);
                 sendAll(message)
@@ -119,103 +108,40 @@ public class BroadcastService {
         }
 
         Messages.VideoMessage update = new Messages.VideoMessage(
-                (String) senderSession.getAttributes().get("username"),
-                contribution.videoStream()
-        );
+                (String) senderSession.getAttributes().get(USERNAME),
+                contribution.videoStream());
         byte[] payload = toStringValue(update);
         TextMessage message = new TextMessage(payload);
         return sendAll(message, senderSession);
     }
 
-    private CompletableFuture sendAll(TextMessage message) {
+    private CompletableFuture<Object> sendAll(TextMessage message) {
         return sendAll(message, null);
     }
-    private CompletableFuture sendAll(TextMessage message, WebSocketSession senderSessionToSkip) {
-//        TODO send sequentially
-//        allSessions.forEach(session -> {
-//                    try {
-//                        if ( senderSessionToSkip == null || !senderSessionToSkip.getId().equals(session.getId())) {
-//                            if (session.isOpen())
-//                                session.sendMessage(message);
-//                            else
-//                                unregisterSession(session);
-//                        }
-//                    } catch (IOException | SessionLimitExceededException e) {
-//                        log.warn("send - error", e);
-//                        // TODO remove session from list
-//                    }
-//                }
-//        );
-//        return CompletableFuture.completedFuture(null);
-//        TODO try in parallel OOM killed after 10 rate with 10 instances
-//        allSessions.entrySet().stream().forEach(k -> {
-//                    var session = k.getValue();
-//                    if (senderSessionToSkip == null || !senderSessionToSkip.equals(session) ) {
-//                        executorService.submit(() -> {
-//                            try {
-//                                session.sendMessage(message);
-//                                return session;
-//                            } catch (IOException e) {
-//                                log.warn("send - error", e);
-//                                // TODO remove session from list
-//                                try {
-//                                    session.close(CloseStatus.SERVER_ERROR);
-//                                } catch (IOException ex) {
-//                                    log.warn("can't close session: {}", session, ex);
-//                                }
-//                                unregisterSession(session);
-//                                return session;
-//                            }
-//                        });
-//                    }
-//                });
-//        return CompletableFuture.completedFuture(null);
-//                CompletableFuture.supplyAsync(() -> {
-//                            try {
-////                                log.info("sendAll broadcast to: {}", session.getId());
-//                                session.sendMessage(message);
-//                                return session;
-//                            } catch (IOException e) {
-//                                log.warn("send - error", e);
-//                                // TODO remove session from list
-//                                try {
-//                                    session.close(CloseStatus.SERVER_ERROR);
-//                                } catch (IOException ex) {
-//                                    log.warn("can't close session: {}", session, ex);
-//                                }
-//                                unregisterSession(session);
-//                                return session;
-//                            }
-//                        }, executorService)
-//        ).toList();
-//        return CompletableFuture.allOf();
-//        return CompletableFuture.allOf(all.toArray(new CompletableFuture[]{}));// TODO OOM
 
+    private CompletableFuture<Object> sendAll(TextMessage message, WebSocketSession senderSessionToSkip) {
         var timedTextMessage = new BufferingWebSocketSession.TimedTextMessage(message, LocalDateTime.now());
-//        TODO send per thread
+
         allSessions.forEach((k, v) -> {
-                    try {
-                        if ( senderSessionToSkip == null || !senderSessionToSkip.getId().equals(v.getDelegate().getId())) {
-                            if (v.getDelegate().isOpen())
-                                v.sendMessage(timedTextMessage);
-                            else
-                                unregisterSession(v.getDelegate());
-                        }
-                    } catch (SessionLimitExceededException e) {
-                        log.warn("send - error", e);
-                        // TODO remove session from list
-                    }
+            try {
+                if (senderSessionToSkip == null || !senderSessionToSkip.getId().equals(v.getDelegate().getId())) {
+                    if (v.getDelegate().isOpen())
+                        v.sendMessage(timedTextMessage);
+                    else
+                        unregisterSession(v.getDelegate());
                 }
-        );
+            } catch (SessionLimitExceededException e) {
+                throw new MessageDeliveryException(e.getMessage());
+            }
+        });
         return CompletableFuture.completedFuture(null);
     }
-
 
     private byte[] toStringValue(Object payload) {
         try {
             return mapper.writeValueAsBytes(payload);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonParseException(e);
         }
     }
 }

@@ -12,9 +12,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Base64;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-
 @Disabled("Actually sends a request to a remote server")
 @SpringBootTest(classes = LLMClient.class, properties = {
 })

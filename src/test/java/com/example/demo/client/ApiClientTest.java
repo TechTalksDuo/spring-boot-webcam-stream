@@ -9,17 +9,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.IntStream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ApiClientTest {
     private static final Logger log = LoggerFactory.getLogger(ApiClientTest.class);
-
 
     @Test
     void test() {
@@ -39,27 +34,25 @@ class ApiClientTest {
     @Test
     void testResize() throws IOException {
         File[] files = Path.of("target/test-classes/input/").toFile().listFiles();
-        for(File f : List.of(files)){
+        for (File f : List.of(files)) {
             resize(f.getAbsolutePath(), Path.of("target/test-classes/input_80/")
                     .resolve(f.getName() + "_resized.png").toFile().getAbsolutePath(), 80, 80);
         }
-
 
     }
 
     @Test
     void testResizePpm() throws IOException {
         File[] files = Path.of("target/test-classes/videos/frames").toFile().listFiles();
-        for(File f : List.of(files)){
+        for (File f : List.of(files)) {
             resize(f.getAbsolutePath(), Path.of("target/test-classes/videos/frames")
                     .resolve(f.getName() + "_resized.png").toFile().getAbsolutePath(), 80, 80);
         }
 
-
     }
 
     public void resize(String inputImagePath,
-                       String outputImagePath, int scaledWidth, int scaledHeight)
+            String outputImagePath, int scaledWidth, int scaledHeight)
             throws IOException {
         // reads input image
         File inputFile = new File(inputImagePath);
