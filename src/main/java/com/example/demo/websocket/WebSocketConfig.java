@@ -2,12 +2,16 @@ package com.example.demo.websocket;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.javafaker.Faker;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
+import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -25,8 +29,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -37,20 +39,19 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class WebSocketConfig implements WebSocketConfigurer {
     private static final Logger log = getLogger(WebSocketConfig.class);
 
+    private final ObjectMapper mapper;
+    private final BroadcastService broadcastService;
+    private final WebSocketMetrics metrics;
+    private final WebSocketSessionMetrics sessionMetrics;
+
     @Autowired
-    ObjectMapper mapper;
-    @Autowired
-    BroadcastService broadcastService;
-    @Autowired
-    WebSocketMetrics metrics;
-    @Autowired
-    WebSocketSessionMetrics sessionMetrics;
-    // private final ExecutorService executorService =
-    // Executors.newThreadPerTaskExecutor(
-    // Thread.ofVirtual()
-    // .name("virtual-threads")
-    // .factory()
-    // );
+    public WebSocketConfig(ObjectMapper mapper, BroadcastService broadcastService, WebSocketMetrics metrics,
+            WebSocketSessionMetrics sessionMetrics) {
+        this.mapper = mapper;
+        this.broadcastService = broadcastService;
+        this.metrics = metrics;
+        this.sessionMetrics = sessionMetrics;
+    }
 
     @Bean
     public List<String> usernames(
@@ -61,12 +62,17 @@ public class WebSocketConfig implements WebSocketConfigurer {
             String[] usernameList = usernameContent.split("\n");
             return Arrays.stream(usernameList).toList();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            Faker faker = new Faker();
+            List<String> usernameList = new ArrayList<>();
+            while (usernameList.size() < 150) {
+                usernameList.add(faker.name().username());
+            }
+            return usernameList;
         }
     }
 
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+    public void registerWebSocketHandlers(@NonNull WebSocketHandlerRegistry registry) {
         registry.addHandler(new WebSocketHandler(usernames(null)), "/websocket")
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new HttpSessionHandshakeInterceptor());
@@ -82,7 +88,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         }
 
         @Override
-        protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
+        protected void handleBinaryMessage(@NonNull WebSocketSession session, @NonNull BinaryMessage message) {
 
             try {
                 session.close(CloseStatus.NOT_ACCEPTABLE.withReason("Binary messages not supported"));
@@ -92,24 +98,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
         }
 
         @Override
-        public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
+        public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) {
             metrics.onMessage((String) session.getAttributes().get("username"));
-            // Handle incoming messages here
-            //// TODO process async
-            // executorService.submit(() -> {
-            //
-            // String receivedMessage = (String) message.getPayload();
-            //// Process the message and send a response if needed`
-            // try {
-            // Messages.ContributionMessage contribution = mapper.readValue(receivedMessage,
-            // Messages.ContributionMessage.class);
-            // broadcastService.send(session, contribution)
-            // .join();
-            // } catch (IOException e) {
-            // throw new RuntimeException(e);
-            // }
-            // });
-            //
+
             String receivedMessage = (String) message.getPayload();
             // Process the message and send a response if needed`
             try {
@@ -122,13 +113,13 @@ public class WebSocketConfig implements WebSocketConfigurer {
         }
 
         @Override
-        public void afterConnectionEstablished(WebSocketSession session) {
+        public void afterConnectionEstablished(@NonNull WebSocketSession session) {
             metrics.onNewSession();
             // Perform actions when a new WebSocket connection is established
             try {
                 session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
                 session.setTextMessageSizeLimit(2 * 1024 * 1024);
-                // TODO decorator session?
+
                 WebSocketSessionDecorator decorator = new MonitoredWebSocketSession(sessionMetrics, session,
                         1_000, 24 * 1024,
                         ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
@@ -147,7 +138,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
                         new Messages.UserConnectedMessage(principal, onlineUsers))));
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new MessageDeliveryException(e.getMessage());
             }
         }
 
@@ -156,7 +147,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         }
 
         @Override
-        public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) {
             metrics.onClosedSession();
             broadcastService.unregisterSession(session);
             // Perform actions when a WebSocket connection is closed
