@@ -3,16 +3,17 @@ package com.example.demo.websocket;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
+import org.springframework.web.socket.handler.WebSocketSessionDecorator;
 
 import java.io.IOException;
 
-public class MonitoredWebSocketSession extends ConcurrentWebSocketSessionDecorator {
+public class MonitoredWebSocketSession extends WebSocketSessionDecorator {
 
     private final WebSocketSessionMetrics metrics;
 
     public MonitoredWebSocketSession(WebSocketSessionMetrics metrics,
-                                     WebSocketSession delegate, int sendTimeLimit, int bufferSizeLimit, OverflowStrategy overflowStrategy) {
-        super(delegate, sendTimeLimit, bufferSizeLimit, overflowStrategy);
+                                     WebSocketSession delegate) {
+        super(delegate);
         this.metrics = metrics;
     }
 
