@@ -5,14 +5,13 @@ import { getRandomColor } from "../utils/color.js";
 import { WebSocketState, WebSocketEvent, WebSocketEventType } from "../events/websocket.js";
 
 class VideoTile extends LitElement {
-  #imageWorker = new Worker("../image-worker.js");
+  #imageWorker = new Worker("../utils/image-worker.js");
   #imageWorkerListener = this.#updateImage.bind(this);
 
   constructor() {
     super();
 
     this.username = "";
-
     this.#imageWorker.addEventListener("message", this.#imageWorkerListener);
 
     WebSocketState.addEventListener(WebSocketEvent.message, ({ detail }) => {
@@ -105,10 +104,10 @@ class VideoTile extends LitElement {
     img.src = "/assets/feather-sprite.svg#video-off";
   }
 
-  #updateImage(e) {
+  #updateImage({ data }) {
     const img = this.shadowRoot.querySelector("img");
     URL.revokeObjectURL(img.src);
-    img.src = e.data;
+    img.src = data;
   }
 }
 
