@@ -5,18 +5,24 @@ import { getRandomColor } from "../utils/color.js";
 import { WebSocketState, WebSocketEvent, WebSocketEventType } from "../events/websocket.js";
 
 class VideoTile extends LitElement {
+  #imageWorker = new Worker("../image-worker.js");
+
   constructor() {
     super();
 
     this.username = "";
+
+    this.#imageWorker.addEventListener("message", this.#imageWorkerListener);
+
     WebSocketState.addEventListener(WebSocketEvent.message, ({ detail }) => {
       if (detail.type === WebSocketEventType.videoFromUser && detail.username === this.username) {
         this.isStreaming = true;
-        this.#showIncomingImage(detail.videoStream);
+        this.#imageWorker.postMessage(detail.videoStream);
       }
       if (detail.type === WebSocketEventType.videoStopped && detail.username === this.username) {
         this.isStreaming = false;
         this.#clearIncomingImage();
+        this.#imageWorker.removeEventListener("message", this.#imageWorkerListener);
       }
     });
   }
@@ -75,6 +81,12 @@ class VideoTile extends LitElement {
     this.style.setProperty("--color", getRandomColor());
   }
 
+  disconnectedCallback() {
+    super.disconnectedCallback();
+
+    this.#imageWorker.terminate();
+  }
+
   render() {
     return html`
       <img alt=${this.username} src="/assets/feather-sprite.svg#video-off" />
@@ -86,30 +98,16 @@ class VideoTile extends LitElement {
     `;
   }
 
-  #showIncomingImage(videoStream) {
-    const img = this.shadowRoot.querySelector("img");
-    URL.revokeObjectURL(img.src);
-    img.src = URL.createObjectURL(this.#dataURItoBlob(videoStream));
-  }
-
   #clearIncomingImage() {
     const img = this.shadowRoot.querySelector("img");
     URL.revokeObjectURL(img.src);
     img.src = "/assets/feather-sprite.svg#video-off";
   }
 
-  #dataURItoBlob(dataURI) {
-    if (!dataURI) return null;
-    const byteString = atob(dataURI.split(",")[1]);
-    const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
-    const arrayBuffer = new ArrayBuffer(byteString.length);
-    const intArray = new Uint8Array(arrayBuffer);
-
-    for (let i = 0; i < byteString.length; i++) {
-      intArray[i] = byteString.charCodeAt(i);
-    }
-
-    return new Blob([arrayBuffer], { type: mimeString });
+  #imageWorkerListener(e) {
+    const img = this.shadowRoot.querySelector("img");
+    URL.revokeObjectURL(img.src);
+    img.src = e.data;
   }
 }
 
