@@ -1,0 +1,26 @@
+services:
+  toxiproxy-ui:
+    image: "buckle/toxiproxy-frontend"
+    platform: linux/amd64
+    ports:
+      - "8470:8080"
+    environment:
+      TOXIPROXY_URL: http://toxiproxy:8474
+    depends_on:
+     - toxiproxy
+  toxiproxy:
+    image: "shopify/toxiproxy"
+    ports:
+      - "8474:8474"
+      - "8081:8080"
+    # We created proxy configuration from another ephermal container
+  toxiproxy-config:
+      image: "shopify/toxiproxy"
+      entrypoint: >
+        sh -c "
+        /go/bin/toxiproxy-cli -h toxiproxy:8474 create --listen 0.0.0.0:8080 --upstream app:8080 app;
+        /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add -t stream=upstream -t bandwidth -a rate=200 app;
+        "
+
+      depends_on:
+         - toxiproxy

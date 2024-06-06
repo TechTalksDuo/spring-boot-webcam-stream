@@ -1,14 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="DemoApplication" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="com.example.demo.DemoApplication" />
+  <configuration default="false" name="DemoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <module name="demo" />
-    <option name="PROGRAM_PARAMETERS" value="--server.port=8080 --server.ssl.enabled=false" />
-    <extension name="coverage">
-      <pattern>
-        <option name="PATTERN" value="com.example.demo.*" />
-        <option name="ENABLED" value="true" />
-      </pattern>
-    </extension>
+    <option name="PROGRAM_PARAMETERS" value="--client.mode=false --ollama.enabled=true --usernames.path=file://${PWD}/www/assets/username-list.md" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.demo.DemoApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
