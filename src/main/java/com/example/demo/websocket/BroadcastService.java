@@ -19,11 +19,11 @@ import org.springframework.web.socket.handler.SessionLimitExceededException;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class BroadcastService {
@@ -31,15 +31,15 @@ public class BroadcastService {
     private static final Logger log = LoggerFactory.getLogger(BroadcastService.class);
     private final ObjectMapper mapper;
     private final LLMClient client;
-    private final Map<String, BufferingWebSocketSession> allSessions = new ConcurrentHashMap<>();
+    private final Map<String, WebSocketSession> allSessions = new ConcurrentHashMap<>();
     private final BackpressureSamplingService samplingService;
     private final String prompt;
     private final boolean ollamaEnabled;
 
     @Autowired
     public BroadcastService(ObjectMapper mapper, LLMClient client, BackpressureSamplingService samplingService,
-            @Value("${ollama.prompt.file}") String promptPath,
-            @Value("${ollama.enabled}") boolean ollamaEnabled) throws IOException {
+                            @Value("${ollama.prompt.file}") String promptPath,
+                            @Value("${ollama.enabled}") boolean ollamaEnabled) throws IOException {
         this.mapper = mapper;
         this.client = client;
         this.samplingService = samplingService;
@@ -50,7 +50,7 @@ public class BroadcastService {
 
     @Timed
     public List<Messages.OnlineUser> registerSession(WebSocketSession session) {
-        allSessions.put(session.getId(), new BufferingWebSocketSession(session));
+        allSessions.put(session.getId(), session);
         byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get(USERNAME),
                 true, allSessions.size()));
         TextMessage message = new TextMessage(payload);
@@ -61,21 +61,17 @@ public class BroadcastService {
     private List<Messages.OnlineUser> getActiveUsers() {
         return allSessions.entrySet()
                 .stream()
-                .map(s -> new Messages.OnlineUser((String) s.getValue().getDelegate().getAttributes().get(USERNAME)))
+                .map(s -> new Messages.OnlineUser((String) s.getValue().getAttributes().get(USERNAME)))
                 .toList();
     }
 
     @Timed
     public void unregisterSession(WebSocketSession session) {
-        BufferingWebSocketSession removed = allSessions.remove(session.getId());
-        try {
-            byte[] payload = toStringValue(new Messages.OnlineStatusChange(
-                    (String) session.getAttributes().get(USERNAME), false, allSessions.size()));
-            TextMessage message = new TextMessage(payload);
-            sendAll(message, session);
-        } finally {
-            removed.cancel();
-        }
+        allSessions.remove(session.getId());
+        byte[] payload = toStringValue(new Messages.OnlineStatusChange(
+                (String) session.getAttributes().get(USERNAME), false, allSessions.size()));
+        TextMessage message = new TextMessage(payload);
+        sendAll(message, session);
     }
 
     @Timed
@@ -120,15 +116,19 @@ public class BroadcastService {
     }
 
     private CompletableFuture<Object> sendAll(TextMessage message, WebSocketSession senderSessionToSkip) {
-        var timedTextMessage = new BufferingWebSocketSession.TimedTextMessage(message, LocalDateTime.now());
 
         allSessions.forEach((k, v) -> {
             try {
-                if (senderSessionToSkip == null || !senderSessionToSkip.getId().equals(v.getDelegate().getId())) {
-                    if (v.getDelegate().isOpen())
-                        v.sendMessage(timedTextMessage);
+                if (senderSessionToSkip == null || !senderSessionToSkip.getId().equals(v.getId())) {
+                    if (v.isOpen()) {
+                        try {
+                            v.sendMessage(message);
+                        } catch (IOException e) {
+                            log.warn("sendAll - failed to send message to sessionId: {}", v.getId(), e);
+                        }
+                    }
                     else
-                        unregisterSession(v.getDelegate());
+                        unregisterSession(v);
                 }
             } catch (SessionLimitExceededException e) {
                 throw new MessageDeliveryException(e.getMessage());

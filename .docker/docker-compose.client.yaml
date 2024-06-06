@@ -10,7 +10,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-beautiful-woman-exited-surprise-face-expression --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-beautiful-woman-exited-surprise-face-expression --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -27,7 +27,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-woman-chatting-from-webcam-for-the-online-meeting --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-woman-chatting-from-webcam-for-the-online-meeting --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -44,7 +44,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-woman-greets-friends-on-webcam-online-meeting --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/asian-woman-greets-friends-on-webcam-online-meeting --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -61,7 +61,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/business-businessman-celebrating-success-excited-caucasian --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/business-businessman-celebrating-success-excited-caucasian --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -78,7 +78,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/excited-young-woman-play-games-by-mobile-phone-make-winner --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/excited-young-woman-play-games-by-mobile-phone-make-winner --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -95,7 +95,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/happy-senior-engineering-architect-wearing-a-vest-and-helmet --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/happy-senior-engineering-architect-wearing-a-vest-and-helmet --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -112,7 +112,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-asian-beautiful-girl-pointing-blank-space-isolated --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-asian-beautiful-girl-pointing-blank-space-isolated --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -129,7 +129,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-businessman-presentation-meeting-online-and --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-businessman-presentation-meeting-online-and --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -146,7 +146,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-young-asian-customer-service-support-agent --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-young-asian-customer-service-support-agent --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -163,7 +163,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-young-asian-man-in-blue-shirt-smiling-and-waving --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/portrait-of-young-asian-man-in-blue-shirt-smiling-and-waving --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -180,7 +180,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/smiling-portrait-of-handsome-young-asian-man-tourists --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/smiling-portrait-of-handsome-young-asian-man-tourists --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:
@@ -197,7 +197,7 @@ services:
       - ../target:/home/app
       - ../www:/home/www
       - ../src/test/resources/videos:/home/input
-    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/young-man-working-on-his-laptop --websocket.rateMillis=120 --websocket.protocol=ws --websocket.target.port=8080 --websocket.target.host=app --server.port=0 --management.server.port=0"
+    command: bash -c "java -jar /home/app/demo-0.0.1-SNAPSHOT.jar --debug --websocket.input.dir=/home/input/young-man-working-on-his-laptop --websocket.rateMillis=120 --websocket.protocol=wss --websocket.target.port=443 --websocket.target.host=emoji.go.ro --server.port=0 --management.server.port=0"
     deploy:
       resources:
         limits:

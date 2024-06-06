@@ -117,11 +117,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
             metrics.onNewSession();
             // Perform actions when a new WebSocket connection is established
             try {
-                session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
-                session.setTextMessageSizeLimit(2 * 1024 * 1024);
+//                session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
+//                session.setTextMessageSizeLimit(2 * 1024 * 1024);
 
-                WebSocketSessionDecorator decorator = new MonitoredWebSocketSession(sessionMetrics, session,
-                        1_000, 24 * 1024,
+                WebSocketSessionDecorator decorator = new ConcurrentWebSocketSessionDecorator(session,
+                        500, 24 * 1024,
                         ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
                 String principal = availableUsernames
                         .get(ThreadLocalRandom.current().nextInt(availableUsernames.size()));
