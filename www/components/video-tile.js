@@ -6,6 +6,7 @@ import { WebSocketState, WebSocketEvent, WebSocketEventType } from "../events/we
 
 class VideoTile extends LitElement {
   #imageWorker = new Worker("../image-worker.js");
+  #imageWorkerListener = this.#updateImage.bind(this);
 
   constructor() {
     super();
@@ -104,7 +105,7 @@ class VideoTile extends LitElement {
     img.src = "/assets/feather-sprite.svg#video-off";
   }
 
-  #imageWorkerListener(e) {
+  #updateImage(e) {
     const img = this.shadowRoot.querySelector("img");
     URL.revokeObjectURL(img.src);
     img.src = e.data;
