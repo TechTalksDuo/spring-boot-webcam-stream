@@ -1,4 +1,5 @@
 import { LitElement, html, css } from "https://esm.run/lit/index.js";
+import "https://esm.run/rvfc-polyfill";
 
 import "./video-feedback.js";
 import { getRandomColor } from "../utils/color.js";
