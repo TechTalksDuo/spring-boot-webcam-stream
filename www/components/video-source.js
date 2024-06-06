@@ -6,11 +6,8 @@ import { WebSocketEvent, WebSocketEventType, WebSocketState } from "../events/we
 import { UserEvents, UserState } from "../events/user.js";
 
 class VideoSource extends LitElement {
-  #videoWorker = new Worker("../utils/video-worker.js");
-  #videoWorkerListener = this.#sendVideoFrame.bind(this);
   #localVideoStream;
   #videoQuality = 0.7;
-  #videoUpdateInterval;
   #frameRate = 12;
 
   constructor() {
@@ -26,10 +23,6 @@ class VideoSource extends LitElement {
         const video = this.shadowRoot.querySelector("video");
         this.#streamVideo(video, this.#localVideoStream);
       }
-    });
-
-    WebSocketState.addEventListener(WebSocketEvent.close, () => {
-      clearInterval(this.#videoUpdateInterval);
     });
   }
 
@@ -119,11 +112,6 @@ class VideoSource extends LitElement {
     }
   `;
 
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this.#videoWorker.terminate();
-  }
-
   render() {
     return html`
       <video autoplay playsinline muted style=${`--color: ${getRandomColor()}`}></video>
@@ -169,11 +157,9 @@ class VideoSource extends LitElement {
   #stopVideo() {
     const video = this.shadowRoot.querySelector("video");
     this.#localVideoStream.getTracks().forEach((track) => track.stop());
-    clearInterval(this.#videoUpdateInterval);
     video.srcObject = null;
     this.isVideoActive = false;
     WebSocketState?.send({ type: WebSocketEventType.videoStopped });
-    this.#videoWorker.removeEventListener("message", this.#videoWorkerListener);
   }
 
   #streamVideo(video, localVideoStream) {
@@ -182,30 +168,17 @@ class VideoSource extends LitElement {
     snapshotCanvas.width = width;
     snapshotCanvas.height = height;
 
-    this.#videoWorker.addEventListener("message", this.#videoWorkerListener);
-
-    // this.#videoUpdateInterval = setInterval(() => {
-    // snapshotCanvas.getContext("2d").clearRect(0, 0, width, height);
-    // snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
-    // const encodedData = snapshotCanvas.toDataURL("image/jpeg", this.#videoQuality);
-
     video.requestVideoFrameCallback(() =>
       this.#processVideoFrame(video, snapshotCanvas, width, height)
     );
-    // }, 1000 / this.#frameRate);
-  }
-
-  #sendVideoFrame({ data }) {
-    WebSocketState?.send({ videoStream: data });
   }
 
   #processVideoFrame(video, snapshotCanvas, width, height) {
     snapshotCanvas.getContext("2d").clearRect(0, 0, width, height);
     snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
 
-    this.#videoWorker.postMessage({ snapshotCanvas, width, height, quality: this.#videoQuality }, [
-      snapshotCanvas,
-    ]);
+    const data = snapshotCanvas.toDataURL("image/jpeg", this.#videoQuality);
+    WebSocketState?.send({ videoStream: data });
 
     if (this.isVideoActive)
       video.requestVideoFrameCallback(() =>
