@@ -154,7 +154,7 @@ class VideoSource extends LitElement {
       video: {
         width: { min: 128, ideal: 256 },
         height: { min: 128, ideal: 256 },
-        frameRate: { ideal: 24, min: 12 },
+        frameRate: { ideal: this.#frameRate, min: 6 },
         facingMode: "user",
         resizeMode: "crop-and-scale",
       },
@@ -177,24 +177,38 @@ class VideoSource extends LitElement {
   }
 
   #streamVideo(video, localVideoStream) {
-    const snapshotCanvas = document.createElement("canvas");
+    const snapshotCanvas = document.createElement("canvas").transferControlToOffscreen();
     const { width, height } = localVideoStream.getVideoTracks()[0].getSettings();
     snapshotCanvas.width = width;
     snapshotCanvas.height = height;
 
     this.#videoWorker.addEventListener("message", this.#videoWorkerListener);
 
-    this.#videoUpdateInterval = setInterval(() => {
-      // snapshotCanvas.getContext("2d").clearRect(0, 0, width, height);
-      // snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
-      // const encodedData = snapshotCanvas.toDataURL("image/jpeg", this.#videoQuality);
+    // this.#videoUpdateInterval = setInterval(() => {
+    // snapshotCanvas.getContext("2d").clearRect(0, 0, width, height);
+    // snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
+    // const encodedData = snapshotCanvas.toDataURL("image/jpeg", this.#videoQuality);
 
-      this.#videoWorker.postMessage({ video, width, height, quality: this.#videoQuality });
-    }, 1000 / this.#frameRate);
+    video.requestVideoFrameCallback(() =>
+      this.#processVideoFrame(video, snapshotCanvas, width, height)
+    );
+    // }, 1000 / this.#frameRate);
   }
 
   #sendVideoFrame({ data }) {
     WebSocketState?.send({ videoStream: data });
+  }
+
+  #processVideoFrame(video, snapshotCanvas, width, height) {
+    snapshotCanvas.getContext("2d").clearRect(0, 0, width, height);
+    snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
+
+    this.#videoWorker.postMessage({ snapshotCanvas, width, height, quality: this.#videoQuality });
+
+    if (this.isVideoActive)
+      video.requestVideoFrameCallback(() =>
+        this.#processVideoFrame(video, snapshotCanvas, width, height)
+      );
   }
 }
 
