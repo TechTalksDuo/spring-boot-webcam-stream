@@ -1,7 +1,7 @@
 self.addEventListener(
   "message",
   async function (e) {
-    if (e.origin !== self.origin) return;
+    if (e.origin && e.origin !== self.origin) return;
 
     const dataURI = e.data;
 
