@@ -173,12 +173,17 @@ class VideoSource extends LitElement {
     );
   }
 
-  #processVideoFrame(video, snapshotCanvas, width, height) {
+  async #processVideoFrame(video, snapshotCanvas, width, height) {
     snapshotCanvas.getContext("2d").clearRect(0, 0, width, height);
     snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
 
-    const data = snapshotCanvas.toDataURL("image/jpeg", this.#videoQuality);
-    WebSocketState?.send({ videoStream: data });
+    const blob = await snapshotCanvas.convertToBlob({
+      type: "image/jpeg",
+      quality: this.#videoQuality,
+    });
+    const reader = new FileReader();
+    reader.onload = () => WebSocketState?.send({ videoStream: reader.result });
+    reader.readAsDataURL(blob);
 
     if (this.isVideoActive)
       video.requestVideoFrameCallback(() =>
