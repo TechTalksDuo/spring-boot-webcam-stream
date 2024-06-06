@@ -83,19 +83,6 @@ public class WebSocketSampleClient implements CommandLineRunner {
         }
     }
 
-    Runnable sendImageToSession(WebSocketSession session) {
-        return () -> {
-            try {
-                String image = getImage();
-                session.sendMessage(new TextMessage(toStringValue(
-                        new Messages.ContributionMessage(Messages.MessageType.VIDEO_FROM_USER, image))));
-            } catch (IOException e) {
-                throw new MessageDeliveryException(e.getMessage());
-            }
-
-        };
-    }
-
     private String getImage() throws IndexOutOfBoundsException {
         return availableImages.get(currentIndex++ % availableImages.size());
     }

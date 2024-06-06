@@ -92,19 +92,16 @@ public class WebSocketConfig implements WebSocketConfigurer {
         public void afterConnectionEstablished(@NonNull WebSocketSession session) {
             // Perform actions when a new WebSocket connection is established
             try {
-                session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
+//                session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
                 session.setTextMessageSizeLimit(2 * 1024 * 1024);
 
-                WebSocketSessionDecorator decorator = new ConcurrentWebSocketSessionDecorator(session,
-                        1000, 24 * 1024,
-                        ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
                 String principal = usernames.get(ThreadLocalRandom.current().nextInt(usernames.size()));
                 session.getAttributes().put("username", principal);
                 session.getAttributes().put("id", UUID.randomUUID());
 
-                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(decorator);
+                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(session);
 
-                decorator.sendMessage(new TextMessage(toStringValue(
+                session.sendMessage(new TextMessage(toStringValue(
                         new Messages.UserConnectedMessage(principal, onlineUsers))));
 
             } catch (IOException e) {
