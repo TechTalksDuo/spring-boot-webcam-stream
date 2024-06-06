@@ -79,12 +79,10 @@ public class WebSocketConfig implements WebSocketConfigurer {
     }
 
     class WebSocketHandler extends AbstractWebSocketHandler {
-        private final List<String> availableUsernames;
         private final List<String> usernames;
 
         WebSocketHandler(List<String> usernames) {
             this.usernames = usernames;
-            this.availableUsernames = new CopyOnWriteArrayList<>(usernames);
         }
 
         @Override
@@ -117,23 +115,18 @@ public class WebSocketConfig implements WebSocketConfigurer {
             metrics.onNewSession();
             // Perform actions when a new WebSocket connection is established
             try {
-//                session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
-//                session.setTextMessageSizeLimit(2 * 1024 * 1024);
+                session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
+                session.setTextMessageSizeLimit(2 * 1024 * 1024);
 
                 WebSocketSessionDecorator decorator = new ConcurrentWebSocketSessionDecorator(session,
-                        500, 24 * 1024,
+                        1000, 24 * 1024,
                         ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
-                String principal = availableUsernames
-                        .get(ThreadLocalRandom.current().nextInt(availableUsernames.size()));
+                String principal = usernames.get(ThreadLocalRandom.current().nextInt(usernames.size()));
                 session.getAttributes().put("username", principal);
                 session.getAttributes().put("id", UUID.randomUUID());
-                availableUsernames.remove(principal);
 
                 List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(decorator);
 
-                if (availableUsernames.isEmpty()) {
-                    availableUsernames.addAll(usernames.stream().map(s -> s + "-" + onlineUsers.size()).toList());
-                }
                 decorator.sendMessage(new TextMessage(toStringValue(
                         new Messages.UserConnectedMessage(principal, onlineUsers))));
 
