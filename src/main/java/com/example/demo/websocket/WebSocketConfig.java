@@ -92,8 +92,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
         public void afterConnectionEstablished(@NonNull WebSocketSession session) {
             // Perform actions when a new WebSocket connection is established
             try {
-//                session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
-                session.setTextMessageSizeLimit(2 * 1024 * 1024);
 
                 String principal = usernames.get(ThreadLocalRandom.current().nextInt(usernames.size()));
                 session.getAttributes().put("username", principal);

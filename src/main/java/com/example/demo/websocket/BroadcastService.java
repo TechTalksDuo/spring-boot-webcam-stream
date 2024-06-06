@@ -92,7 +92,7 @@ public class BroadcastService {
                         .substring(contribution.videoStream().lastIndexOf(",") + 1);
                 var answer = client.ask(base64);
 
-                log.info("Got answer: {}", answer);
+                log.debug("Got answer: {}", answer);
                 Messages.VideoFeedbackMessage update = new Messages.VideoFeedbackMessage(
                         (String) senderSession.getAttributes().get(USERNAME),
                         answer);

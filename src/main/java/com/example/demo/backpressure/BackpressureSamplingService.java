@@ -27,32 +27,22 @@ public class BackpressureSamplingService {
     private boolean isEnabled = true;
     private final Executor noBackpressure = Executors.newVirtualThreadPerTaskExecutor();
     private final Map<UUID, LocalDateTime> inProgress = new ConcurrentHashMap<>();
-    private final BackpressureMetrics metrics;
-
-    public BackpressureSamplingService(BackpressureMetrics metrics) {
-        this.metrics = metrics;
-    }
-
 
     public void sample(UUID id, Runnable runnable) {
         if (!isEnabled) {
-            metrics.onRequest();
             try {
                 noBackpressure.execute(() -> {
                     try {
                         runnable.run();
-                        metrics.onFinishedRequest();
                     } catch (Exception e) {
                         e.printStackTrace();
-                        metrics.onError();
                     }
                 });
             } catch (Exception e) {
-                metrics.onRejectedRequest();
+                e.printStackTrace();
             }
             return;
         }
-        metrics.onRequest();
         log.trace("sample - user {}", id);
 
         LocalDateTime now = LocalDateTime.now();
@@ -62,7 +52,6 @@ public class BackpressureSamplingService {
                 return now.plusSeconds(2);
             }
             log.debug("sample - skip user {} until expirationTime: {}", id, v);
-            metrics.onDroppedRequest();
             return v;
         });
 
@@ -70,20 +59,16 @@ public class BackpressureSamplingService {
 
     private void callMethod(UUID id, Runnable runnable) {
         try {
-            metrics.onSubmit();
             executor.execute(() -> {
                 log.debug("sample - starting user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
                 try {
                     runnable.run();
                     log.debug("sample - finished user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
-                    metrics.onFinishedRequest();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    metrics.onError();
                 }
             });
         } catch (Exception e) {
-            metrics.onRejectedRequest();
             log.debug("sample - skip user {} due to limit reached: {}/{}", id, workQueue.size(), QUEUE_SIZE);
         }
     }

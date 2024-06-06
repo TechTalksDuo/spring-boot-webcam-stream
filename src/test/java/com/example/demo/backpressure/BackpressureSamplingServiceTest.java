@@ -24,9 +24,6 @@ class BackpressureSamplingServiceTest {
     @Autowired
     BackpressureSamplingService service;
 
-    @MockBean
-    BackpressureMetrics metrics;
-
     @Mock
     Supplier<Object> supplier;
 
@@ -45,7 +42,6 @@ class BackpressureSamplingServiceTest {
         });
         latch.await();
         verify(supplier, never()).get();
-        verify(metrics, times(2)).onRequest();
     }
 
     @Test
@@ -63,7 +59,6 @@ class BackpressureSamplingServiceTest {
             latch.countDown();
         });
         latch.await();
-        verify(metrics, times(2)).onRequest();
     }
 
     @Test
@@ -84,8 +79,6 @@ class BackpressureSamplingServiceTest {
                     });
                 });
         latch.await();
-        verify(metrics, times(TOTAL)).onRequest();
-        verify(metrics, times(TOTAL)).onFinishedRequest();
     }
 
     @Test
@@ -107,9 +100,6 @@ class BackpressureSamplingServiceTest {
                     latch.countDown();
                 })));
         latch.await();
-        verify(metrics, times(TOTAL)).onRequest();
-        verify(metrics, times(REJECTED_REQUESTS)).onRejectedRequest();
-        verify(metrics, times(EXPECTED_FINISHED_REQUESTS)).onFinishedRequest();
     }
 
 }
