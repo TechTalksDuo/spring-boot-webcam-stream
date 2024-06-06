@@ -41,39 +41,18 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final ObjectMapper mapper;
     private final BroadcastService broadcastService;
-    private final WebSocketMetrics metrics;
-    private final WebSocketSessionMetrics sessionMetrics;
+    private final List<String> usernames;
 
     @Autowired
-    public WebSocketConfig(ObjectMapper mapper, BroadcastService broadcastService, WebSocketMetrics metrics,
-            WebSocketSessionMetrics sessionMetrics) {
+    public WebSocketConfig(ObjectMapper mapper, BroadcastService broadcastService, List<String> usernames) {
         this.mapper = mapper;
         this.broadcastService = broadcastService;
-        this.metrics = metrics;
-        this.sessionMetrics = sessionMetrics;
-    }
-
-    @Bean
-    public List<String> usernames(
-            @Value("${usernames.path:file:///home/www/assets/username-list.md}") String usernamesPath) {
-        try {
-            String usernameContent = Files
-                    .readString(ResourceUtils.getFile(usernamesPath).toPath());
-            String[] usernameList = usernameContent.split("\n");
-            return Arrays.stream(usernameList).toList();
-        } catch (IOException e) {
-            Faker faker = new Faker();
-            List<String> usernameList = new ArrayList<>();
-            while (usernameList.size() < 150) {
-                usernameList.add(faker.name().username());
-            }
-            return usernameList;
-        }
+        this.usernames = usernames;
     }
 
     @Override
     public void registerWebSocketHandlers(@NonNull WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebSocketHandler(usernames(null)), "/websocket")
+        registry.addHandler(new WebSocketHandler(usernames), "/websocket")
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new HttpSessionHandshakeInterceptor());
     }
@@ -97,7 +76,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         @Override
         public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) {
-            metrics.onMessage((String) session.getAttributes().get("username"));
 
             String receivedMessage = (String) message.getPayload();
             // Process the message and send a response if needed`
@@ -112,7 +90,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         @Override
         public void afterConnectionEstablished(@NonNull WebSocketSession session) {
-            metrics.onNewSession();
             // Perform actions when a new WebSocket connection is established
             try {
                 session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
@@ -141,7 +118,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         @Override
         public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) {
-            metrics.onClosedSession();
             broadcastService.unregisterSession(session);
             // Perform actions when a WebSocket connection is closed
         }
