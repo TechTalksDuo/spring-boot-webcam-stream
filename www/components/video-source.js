@@ -203,7 +203,9 @@ class VideoSource extends LitElement {
     snapshotCanvas.getContext("2d").clearRect(0, 0, width, height);
     snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
 
-    this.#videoWorker.postMessage({ snapshotCanvas, width, height, quality: this.#videoQuality });
+    this.#videoWorker.postMessage({ snapshotCanvas, width, height, quality: this.#videoQuality }, [
+      snapshotCanvas,
+    ]);
 
     if (this.isVideoActive)
       video.requestVideoFrameCallback(() =>
