@@ -19,7 +19,7 @@ services:
       entrypoint: >
         sh -c "
         /go/bin/toxiproxy-cli -h toxiproxy:8474 create --listen 0.0.0.0:8080 --upstream app:8080 app;
-        /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add -t stream=upstream -t bandwidth -a rate=200 app;
+        /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add --upstream -t bandwidth -a rate=200 app;
         "
 
       depends_on:
