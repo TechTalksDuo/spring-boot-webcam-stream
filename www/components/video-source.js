@@ -143,7 +143,7 @@ class VideoSource extends LitElement {
       video: {
         width: { min: 128, ideal: 256 },
         height: { min: 128, ideal: 256 },
-        frameRate: { ideal: this.#frameRate, min: 6 },
+        frameRate: { ideal: this.#frameRate, max: this.#frameRate, min: this.#frameRate / 2 },
         facingMode: "user",
         resizeMode: "crop-and-scale",
       },
