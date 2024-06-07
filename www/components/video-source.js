@@ -1,4 +1,5 @@
 import { LitElement, html, css } from "https://esm.run/lit/index.js";
+import "https://esm.run/rvfc-polyfill";
 
 import "./video-feedback.js";
 import { getRandomColor } from "../utils/color.js";
@@ -8,7 +9,6 @@ import { UserEvents, UserState } from "../events/user.js";
 class VideoSource extends LitElement {
   #localVideoStream;
   #videoQuality = 0.7;
-  #videoUpdateInterval;
   #frameRate = 12;
 
   constructor() {
@@ -24,10 +24,6 @@ class VideoSource extends LitElement {
         const video = this.shadowRoot.querySelector("video");
         this.#streamVideo(video, this.#localVideoStream);
       }
-    });
-
-    WebSocketState.addEventListener(WebSocketEvent.close, () => {
-      clearInterval(this.#videoUpdateInterval);
     });
   }
 
@@ -147,8 +143,9 @@ class VideoSource extends LitElement {
       video: {
         width: { min: 128, ideal: 256 },
         height: { min: 128, ideal: 256 },
-        frameRate: { ideal: 24, min: 12 },
+        frameRate: { ideal: this.#frameRate, max: this.#frameRate, min: this.#frameRate / 2 },
         facingMode: "user",
+        resizeMode: "crop-and-scale",
       },
     });
 
@@ -161,24 +158,38 @@ class VideoSource extends LitElement {
   #stopVideo() {
     const video = this.shadowRoot.querySelector("video");
     this.#localVideoStream.getTracks().forEach((track) => track.stop());
-    clearInterval(this.#videoUpdateInterval);
     video.srcObject = null;
     this.isVideoActive = false;
     WebSocketState?.send({ type: WebSocketEventType.videoStopped });
   }
 
   #streamVideo(video, localVideoStream) {
-    const snapshotCanvas = document.createElement("canvas");
+    const snapshotCanvas = document.createElement("canvas").transferControlToOffscreen();
     const { width, height } = localVideoStream.getVideoTracks()[0].getSettings();
     snapshotCanvas.width = width;
     snapshotCanvas.height = height;
 
-    this.#videoUpdateInterval = setInterval(() => {
-      snapshotCanvas.getContext("2d").clearRect(0, 0, width, height);
-      snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
-      const encodedData = snapshotCanvas.toDataURL("image/jpeg", this.#videoQuality);
-      WebSocketState?.send({ videoStream: encodedData });
-    }, 1000 / this.#frameRate);
+    video.requestVideoFrameCallback(() =>
+      this.#processVideoFrame(video, snapshotCanvas, width, height)
+    );
+  }
+
+  async #processVideoFrame(video, snapshotCanvas, width, height) {
+    snapshotCanvas.getContext("2d").clearRect(0, 0, width, height);
+    snapshotCanvas.getContext("2d").drawImage(video, 0, 0, width, height);
+
+    const blob = await snapshotCanvas.convertToBlob({
+      type: "image/jpeg",
+      quality: this.#videoQuality,
+    });
+    const reader = new FileReader();
+    reader.onload = () => WebSocketState?.send({ videoStream: reader.result });
+    reader.readAsDataURL(blob);
+
+    if (this.isVideoActive)
+      video.requestVideoFrameCallback(() =>
+        this.#processVideoFrame(video, snapshotCanvas, width, height)
+      );
   }
 }
 
