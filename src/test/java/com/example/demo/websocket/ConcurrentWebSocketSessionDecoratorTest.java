@@ -18,13 +18,44 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-public class ConcurrentWebSocketSessionDecoratorTest {
+class ConcurrentWebSocketSessionDecoratorTest {
     private static final Logger log = LoggerFactory.getLogger(ConcurrentWebSocketSessionDecoratorTest.class);
 
     ExecutorService receiveMessagesExecutor = Executors.newVirtualThreadPerTaskExecutor();
     ExecutorService sentToSessionsExecutor = Executors.newVirtualThreadPerTaskExecutor();
-//    ExecutorService executor = Executors.newCachedThreadPool();
+    ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
     ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
+
+    @Test
+    void testSimple() throws IOException, InterruptedException {
+        int NUMBER_OF_MESSAGES = 700;
+
+        CountDownLatch latch = new CountDownLatch(NUMBER_OF_MESSAGES);
+        WebSocketSession delegate = Mockito.mock(WebSocketSession.class);
+        WebSocketMessage<?> message = Mockito.mock(WebSocketMessage.class);
+        Mockito.doAnswer(ans -> {
+            log.info("send on threadId: {}", Thread.currentThread());
+            Thread.sleep(12);
+            latch.countDown();
+            return null;
+        }).when(delegate).sendMessage(message);
+
+
+        WebSocketSession session = new WebSocketSessionDecorator(delegate);
+//        WebSocketSession session = new ConcurrentWebSocketSessionDecorator(delegate, 1000, 16*1024);
+
+        IntStream.range(0, NUMBER_OF_MESSAGES)
+                .forEach(currentMessage -> {
+                    cachedThreadPool.submit(() -> {
+                        try {
+                            session.sendMessage(message);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                });
+        latch.await();
+    }
 
     @Test
     void test() throws IOException, InterruptedException {
