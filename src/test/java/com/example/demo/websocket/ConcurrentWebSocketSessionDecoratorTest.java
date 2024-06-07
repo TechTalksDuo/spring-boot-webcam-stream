@@ -23,8 +23,40 @@ public class ConcurrentWebSocketSessionDecoratorTest {
 
     ExecutorService receiveMessagesExecutor = Executors.newVirtualThreadPerTaskExecutor();
     ExecutorService sentToSessionsExecutor = Executors.newVirtualThreadPerTaskExecutor();
-//    ExecutorService executor = Executors.newCachedThreadPool();
+    ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
     ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
+
+    @Test
+    void testSimple() throws IOException, InterruptedException {
+        int NUMBER_OF_MESSAGES = 700;
+
+        CountDownLatch latch = new CountDownLatch(NUMBER_OF_MESSAGES);
+        WebSocketSession delegate = Mockito.mock(WebSocketSession.class);
+        WebSocketMessage<?> message = Mockito.mock(WebSocketMessage.class);
+        Mockito.doAnswer(ans -> {
+            log.info("send on threadId: {}", Thread.currentThread());
+            Thread.sleep(12);
+            latch.countDown();
+            return null;
+        }).when(delegate).sendMessage(message);
+
+
+        WebSocketSessionDecorator session = new WebSocketSessionDecorator(delegate);
+//        WebSocketSessionDecorator session = new ConcurrentWebSocketSessionDecorator(delegate, 1000, 16*1024);
+
+        IntStream.range(0, NUMBER_OF_MESSAGES)
+                .forEach(currentMessage -> {
+                    sentToSessionsExecutor.submit(() -> {
+                        log.info("send currentMessage: {}, session: {}, thread: {}", currentMessage, session, Thread.currentThread().threadId());
+                        try {
+                            session.sendMessage(message);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                });
+        latch.await();
+    }
 
     @Test
     void test() throws IOException, InterruptedException {
@@ -50,27 +82,27 @@ public class ConcurrentWebSocketSessionDecoratorTest {
 
         scheduledExecutorService.scheduleAtFixedRate(() -> {
 
-            IntStream.range(0, NUMBER_OF_MESSAGES)
-                    .forEach(currentMessage -> {
-                        receiveMessagesExecutor.submit(() -> {
-                            log.info("prepare currentMessage: {}, thread: {}", currentMessage, Thread.currentThread().threadId());
-                            sessions
-                                    .forEach(currentSession -> {
-                                        sentToSessionsExecutor.submit(() -> {
-                                            log.info("send currentMessage: {}, session: {}, thread: {}", currentMessage, currentSession, Thread.currentThread().threadId());
-                                            try {
-                                                currentSession.sendMessage(message);
-                                            } catch (IOException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                        });
-                                    });
+                    IntStream.range(0, NUMBER_OF_MESSAGES)
+                            .forEach(currentMessage -> {
+                                receiveMessagesExecutor.submit(() -> {
+                                    log.info("prepare currentMessage: {}, thread: {}", currentMessage, Thread.currentThread().threadId());
+                                    sessions
+                                            .forEach(currentSession -> {
+                                                sentToSessionsExecutor.submit(() -> {
+                                                    log.info("send currentMessage: {}, session: {}, thread: {}", currentMessage, currentSession, Thread.currentThread().threadId());
+                                                    try {
+                                                        currentSession.sendMessage(message);
+                                                    } catch (IOException e) {
+                                                        throw new RuntimeException(e);
+                                                    }
+                                                });
+                                            });
 
-                        });
+                                });
 
-                    });
-        }
-        , 0, 1, TimeUnit.SECONDS);
+                            });
+                }
+                , 0, 1, TimeUnit.SECONDS);
 
         latch.await();
     }
