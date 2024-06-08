@@ -2,18 +2,17 @@ package com.example.demo.websocket;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.javafaker.Faker;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.MessageDeliveryException;
-import org.springframework.util.ResourceUtils;
-import org.springframework.web.socket.*;
+import org.springframework.web.socket.BinaryMessage;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
@@ -23,13 +22,9 @@ import org.springframework.web.socket.handler.WebSocketSessionDecorator;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -43,48 +38,32 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private final BroadcastService broadcastService;
     private final WebSocketMetrics metrics;
     private final WebSocketSessionMetrics sessionMetrics;
+    private final List<String> usernames;
+    private final AtomicInteger counter = new AtomicInteger();
 
     @Autowired
     public WebSocketConfig(ObjectMapper mapper, BroadcastService broadcastService, WebSocketMetrics metrics,
-            WebSocketSessionMetrics sessionMetrics) {
+                           WebSocketSessionMetrics sessionMetrics,
+                           List<String> usernames) {
         this.mapper = mapper;
         this.broadcastService = broadcastService;
         this.metrics = metrics;
         this.sessionMetrics = sessionMetrics;
-    }
-
-    @Bean
-    public List<String> usernames(
-            @Value("${usernames.path:file:///home/www/assets/username-list.md}") String usernamesPath) {
-        try {
-            String usernameContent = Files
-                    .readString(ResourceUtils.getFile(usernamesPath).toPath());
-            String[] usernameList = usernameContent.split("\n");
-            return Arrays.stream(usernameList).toList();
-        } catch (IOException e) {
-            Faker faker = new Faker();
-            List<String> usernameList = new ArrayList<>();
-            while (usernameList.size() < 150) {
-                usernameList.add(faker.name().username());
-            }
-            return usernameList;
-        }
+        this.usernames = usernames;
     }
 
     @Override
     public void registerWebSocketHandlers(@NonNull WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebSocketHandler(usernames(null)), "/websocket")
+        registry.addHandler(new WebSocketHandler(usernames), "/websocket")
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new HttpSessionHandshakeInterceptor());
     }
 
     class WebSocketHandler extends AbstractWebSocketHandler {
-        private final List<String> availableUsernames;
         private final List<String> usernames;
 
         WebSocketHandler(List<String> usernames) {
             this.usernames = usernames;
-            this.availableUsernames = new CopyOnWriteArrayList<>(usernames);
         }
 
         @Override
@@ -123,17 +102,12 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 WebSocketSessionDecorator decorator = new MonitoredWebSocketSession(sessionMetrics, session,
                         1_000, 24 * 1024,
                         ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
-                String principal = availableUsernames
-                        .get(ThreadLocalRandom.current().nextInt(availableUsernames.size()));
+                String principal = usernames.get(counter.incrementAndGet() % usernames.size());
                 session.getAttributes().put("username", principal);
                 session.getAttributes().put("id", UUID.randomUUID());
-                availableUsernames.remove(principal);
 
                 List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(decorator);
 
-                if (availableUsernames.isEmpty()) {
-                    availableUsernames.addAll(usernames.stream().map(s -> s + "-" + onlineUsers.size()).toList());
-                }
                 decorator.sendMessage(new TextMessage(toStringValue(
                         new Messages.UserConnectedMessage(principal, onlineUsers))));
 
