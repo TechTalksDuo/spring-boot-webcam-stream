@@ -75,6 +75,12 @@ services:
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-12
+  client-toxiproxy:
+    deploy:
+      replicas: 1
+    extends:
+      file: .docker/docker-compose.client.yaml
+      service: client-toxiproxy
   prometheus:
     extends:
       file: .docker/docker-compose.metrics.yaml

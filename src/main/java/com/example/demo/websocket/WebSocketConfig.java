@@ -41,12 +41,18 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final ObjectMapper mapper;
     private final BroadcastService broadcastService;
+    private final WebSocketMetrics metrics;
+    private final WebSocketSessionMetrics sessionMetrics;
     private final List<String> usernames;
 
     @Autowired
-    public WebSocketConfig(ObjectMapper mapper, BroadcastService broadcastService, List<String> usernames) {
+    public WebSocketConfig(ObjectMapper mapper, BroadcastService broadcastService, WebSocketMetrics metrics,
+            WebSocketSessionMetrics sessionMetrics,
+                           List<String> usernames) {
         this.mapper = mapper;
         this.broadcastService = broadcastService;
+        this.metrics = metrics;
+        this.sessionMetrics = sessionMetrics;
         this.usernames = usernames;
     }
 
@@ -76,6 +82,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         @Override
         public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) {
+            metrics.onMessage((String) session.getAttributes().get("username"));
 
             String receivedMessage = (String) message.getPayload();
             // Process the message and send a response if needed`
@@ -90,16 +97,23 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         @Override
         public void afterConnectionEstablished(@NonNull WebSocketSession session) {
+            metrics.onNewSession();
             // Perform actions when a new WebSocket connection is established
             try {
+
+                session.setTextMessageSizeLimit(2 * 1024 * 1024);
 
                 String principal = usernames.get(ThreadLocalRandom.current().nextInt(usernames.size()));
                 session.getAttributes().put("username", principal);
                 session.getAttributes().put("id", UUID.randomUUID());
 
-                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(session);
+                WebSocketSessionDecorator decorator = new MonitoredWebSocketSession(sessionMetrics, session,
+                        1_000, 24 * 1024,
+                        ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
 
-                session.sendMessage(new TextMessage(toStringValue(
+                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(decorator);
+
+                decorator.sendMessage(new TextMessage(toStringValue(
                         new Messages.UserConnectedMessage(principal, onlineUsers))));
 
             } catch (IOException e) {
@@ -113,6 +127,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         @Override
         public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) {
+            metrics.onClosedSession();
             broadcastService.unregisterSession(session);
             // Perform actions when a WebSocket connection is closed
         }
