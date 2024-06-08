@@ -49,12 +49,12 @@ public class BroadcastService {
     }
 
     @Timed
-    public List<Messages.OnlineUser> registerSession(WebSocketSession session) {
-        allSessions.put(session.getId(), new BufferingWebSocketSession(session));
-        byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getAttributes().get(USERNAME),
+    public List<Messages.OnlineUser> registerSession(BufferingWebSocketSession session) {
+        allSessions.put(session.getDelegate().getId(), session);
+        byte[] payload = toStringValue(new Messages.OnlineStatusChange((String) session.getDelegate().getAttributes().get(USERNAME),
                 true, allSessions.size()));
         TextMessage message = new TextMessage(payload);
-        sendAll(message, session);
+        sendAll(message, session.getDelegate());
         return getActiveUsers();
     }
 

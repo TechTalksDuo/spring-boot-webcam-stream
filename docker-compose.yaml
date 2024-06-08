@@ -5,82 +5,86 @@ services:
       service: app
   client-1:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-1
   client-2:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-2
   client-3:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-3
   client-4:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-4
   client-5:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-5
   client-6:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-6
   client-7:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-7
   client-8:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-8
   client-9:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-9
   client-10:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-10
   client-11:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-11
   client-12:
     deploy:
-      replicas: 1
+      replicas: 3
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-12
   client-toxiproxy:
-    deploy:
-      replicas: 1
     extends:
       file: .docker/docker-compose.client.yaml
       service: client-toxiproxy
+  client-multiple:
+    deploy:
+      replicas: 2
+    extends:
+      file: .docker/docker-compose.client.yaml
+      service: client-multiple
   prometheus:
     extends:
       file: .docker/docker-compose.metrics.yaml

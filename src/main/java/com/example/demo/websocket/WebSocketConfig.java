@@ -22,6 +22,7 @@ import org.springframework.web.socket.handler.WebSocketSessionDecorator;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -99,17 +100,17 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 session.setBinaryMessageSizeLimit(2 * 1024 * 1024);
                 session.setTextMessageSizeLimit(2 * 1024 * 1024);
 
-                WebSocketSessionDecorator decorator = new MonitoredWebSocketSession(sessionMetrics, session,
-                        1_000, 24 * 1024,
-                        ConcurrentWebSocketSessionDecorator.OverflowStrategy.DROP);
+                WebSocketSessionDecorator decorator = new MonitoredWebSocketSession(sessionMetrics, session);
+                var buffered = new BufferingWebSocketSession(decorator);
                 String principal = usernames.get(counter.incrementAndGet() % usernames.size());
                 session.getAttributes().put("username", principal);
                 session.getAttributes().put("id", UUID.randomUUID());
 
-                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(decorator);
+                List<Messages.OnlineUser> onlineUsers = broadcastService.registerSession(buffered);
+                var timedTextMessage = new BufferingWebSocketSession.TimedTextMessage(new TextMessage(toStringValue(
+                        new Messages.UserConnectedMessage(principal, onlineUsers))), LocalDateTime.now());
 
-                decorator.sendMessage(new TextMessage(toStringValue(
-                        new Messages.UserConnectedMessage(principal, onlineUsers))));
+                buffered.sendMessage(timedTextMessage);
 
             } catch (IOException e) {
                 throw new MessageDeliveryException(e.getMessage());
