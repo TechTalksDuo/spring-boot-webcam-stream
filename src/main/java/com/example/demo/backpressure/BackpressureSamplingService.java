@@ -72,10 +72,10 @@ public class BackpressureSamplingService {
         try {
             metrics.onSubmit();
             executor.execute(() -> {
-                log.info("sample - starting user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
+                log.debug("sample - starting user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
                 try {
                     runnable.run();
-                    log.info("sample - finished user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
+                    log.debug("sample - finished user {} workQueue: {}/{}", id, workQueue.size(), QUEUE_SIZE);
                     metrics.onFinishedRequest();
                 } catch (Exception e) {
                     e.printStackTrace();

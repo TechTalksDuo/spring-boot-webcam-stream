@@ -13,7 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class BufferingWebSocketSession {
     private final WebSocketSession delegate;
     private final LinkedBlockingQueue<TimedTextMessage> buffer = new LinkedBlockingQueue<>();
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(64);
+    private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
     private Future<?> future;
 
     public BufferingWebSocketSession(WebSocketSession delegate) {
