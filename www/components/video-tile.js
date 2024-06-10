@@ -37,6 +37,7 @@ class VideoTile extends LitElement {
       background-color: var(--color, transparent);
       color: transparent;
       position: relative;
+      container-type: inline-size;
     }
 
     img {
@@ -63,7 +64,8 @@ class VideoTile extends LitElement {
       height: auto;
     }
 
-    .username:not(:empty) {
+    .username:not(:empty),
+    .username-initials:not(:empty) {
       position: absolute;
       left: 0;
       bottom: 0;
@@ -73,6 +75,20 @@ class VideoTile extends LitElement {
       border-radius: 0 0.5rem 0 0;
       z-index: 100;
       font-size: clamp(0.5rem, 3vmin, 1rem);
+    }
+
+    .username-initials {
+      display: none;
+    }
+
+    @container (width < 128px) {
+      .username {
+        display: none;
+      }
+
+      .username-initials {
+        display: block;
+      }
     }
   `;
 
@@ -95,6 +111,12 @@ class VideoTile extends LitElement {
         : ""}
       <video-feedback .username=${this.username}></video-feedback>
       <span class="username">${this.username}</span>
+      <span class="username-initials">
+        ${this.username
+          .split(" ")
+          .map((word) => word[0])
+          .join("")}
+      </span>
     `;
   }
 

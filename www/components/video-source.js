@@ -35,6 +35,7 @@ class VideoSource extends LitElement {
     :host {
       position: relative;
       overflow: hidden;
+      container-type: inline-size;
     }
 
     :host(:not(:hover)) .streaming {
@@ -64,7 +65,8 @@ class VideoSource extends LitElement {
       }
     }
 
-    .username {
+    .username,
+    .username-initials {
       position: absolute;
       left: 0;
       bottom: 0;
@@ -81,6 +83,10 @@ class VideoSource extends LitElement {
         z-index: 100;
         font-size: clamp(0.5rem, 3vmin, 1rem);
       }
+    }
+
+    .username-initials {
+      display: none;
     }
 
     video {
@@ -108,6 +114,16 @@ class VideoSource extends LitElement {
       stroke-linejoin: round;
       fill: none;
     }
+
+    @container (width < 128px) {
+      .username {
+        display: none;
+      }
+
+      .username-initials {
+        display: block;
+      }
+    }
   `;
 
   render() {
@@ -130,6 +146,12 @@ class VideoSource extends LitElement {
             </button>`}
       </span>
       <span class="username">${UserState.me.username}</span>
+      <span class="username-initials">
+        ${UserState.me.username
+          ?.split(" ")
+          ?.map((word) => word[0])
+          ?.join("")}
+      </span>
     `;
   }
 

@@ -60,7 +60,7 @@ class VideoFeedback extends LitElement {
 
     text.textContent = String(emoji);
     text.setAttribute("font-size", score * 64);
-    text.setAttribute("x", `${Math.random() * 100}%`);
+    text.setAttribute("x", `${16 + Math.random() * 84}%`);
     text.setAttribute("y", "100%");
 
     svg.append(text);
