@@ -94,7 +94,7 @@ class VideoTile extends LitElement {
         ? html`<img class="no-image" alt="No image" src="/assets/user.svg" />`
         : ""}
       <video-feedback .username=${this.username}></video-feedback>
-      <span class="username">${this.#usernameOrInitials}</span>
+      <span class="username">${this.username}</span>
     `;
   }
 
@@ -108,16 +108,6 @@ class VideoTile extends LitElement {
     const img = this.shadowRoot.querySelector("img");
     URL.revokeObjectURL(img.src);
     img.src = data;
-  }
-
-  get #usernameOrInitials() {
-    if (!this.username) return "??";
-    return this.username.length * 5 < this.clientWidth
-      ? this.username
-      : this.username
-          .split(" ")
-          .map((n) => n[0])
-          .join("");
   }
 }
 

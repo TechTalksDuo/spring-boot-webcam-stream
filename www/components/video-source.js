@@ -129,7 +129,7 @@ class VideoSource extends LitElement {
               Stream
             </button>`}
       </span>
-      <span class="username">${this.#usernameOrInitials}</span>
+      <span class="username">${UserState.me.username}</span>
     `;
   }
 
@@ -187,17 +187,6 @@ class VideoSource extends LitElement {
       video.requestVideoFrameCallback(() =>
         this.#processVideoFrame(video, snapshotCanvas, width, height)
       );
-  }
-
-  get #usernameOrInitials() {
-    const { username } = UserState.me;
-    if (!username) return "";
-    return username.length * 5 < this.clientWidth
-      ? username
-      : username
-          .split(" ")
-          .map((n) => n[0])
-          .join("");
   }
 }
 
