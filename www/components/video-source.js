@@ -146,7 +146,7 @@ class VideoSource extends LitElement {
             </button>`}
       </span>
       <span class="username">${UserState.me.username}</span>
-      <span class="username-initials">
+      <span class="username-initials" title="${UserState.me.username}">
         ${UserState.me.username
           ?.split(" ")
           ?.map((word) => word[0])

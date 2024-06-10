@@ -111,7 +111,7 @@ class VideoTile extends LitElement {
         : ""}
       <video-feedback .username=${this.username}></video-feedback>
       <span class="username">${this.username}</span>
-      <span class="username-initials">
+      <span class="username-initials" title="${this.username}">
         ${this.username
           .split(" ")
           .map((word) => word[0])
