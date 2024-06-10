@@ -17,7 +17,7 @@ class UserEventTarget extends EventTarget {
    * @type {{username: String}}
    * @private
    */
-  #me = null;
+  #me = {};
 
   /**
    * Number of active users
@@ -68,7 +68,7 @@ class UserEventTarget extends EventTarget {
 
   clear() {
     this.#users = [];
-    this.#me = null;
+    this.#me = {};
     this.#activeUsers = 0;
     this.dispatchEvent(new CustomEvent(UserEvents.clear));
     this.dispatchEvent(new CustomEvent(UserEvents.update));
