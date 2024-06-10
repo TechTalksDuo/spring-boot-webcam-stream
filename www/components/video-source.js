@@ -192,7 +192,7 @@ class VideoSource extends LitElement {
   get #usernameOrInitials() {
     const { username } = UserState.me;
     if (!username) return "";
-    return username.length < this.clientWidth * 2
+    return username.length * 2 < this.clientWidth
       ? username
       : username
           .split(" ")

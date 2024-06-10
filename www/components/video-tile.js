@@ -112,7 +112,7 @@ class VideoTile extends LitElement {
 
   get #usernameOrInitials() {
     if (!this.username) return "??";
-    return this.username.length < this.clientWidth * 2
+    return this.username.length * 2 < this.clientWidth
       ? this.username
       : this.username
           .split(" ")
