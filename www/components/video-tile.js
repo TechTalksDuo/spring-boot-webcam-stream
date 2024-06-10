@@ -67,7 +67,7 @@ class VideoTile extends LitElement {
       position: absolute;
       left: 0;
       bottom: 0;
-      padding: clamp(0.25rem, 2.5vmin, 0.5rem) clamp(0.5rem, 2.5vmin, 1rem);
+      padding: clamp(0.25rem, 0.5vmin, 0.5rem) clamp(0.75rem, 1vmin, 1rem);
       background-color: #17e;
       color: #fff;
       border-radius: 0 0.5rem 0 0;
@@ -94,7 +94,7 @@ class VideoTile extends LitElement {
         ? html`<img class="no-image" alt="No image" src="/assets/user.svg" />`
         : ""}
       <video-feedback .username=${this.username}></video-feedback>
-      <span class="username">${this.username}</span>
+      <span class="username">${this.#usernameOrInitials}</span>
     `;
   }
 
@@ -108,6 +108,16 @@ class VideoTile extends LitElement {
     const img = this.shadowRoot.querySelector("img");
     URL.revokeObjectURL(img.src);
     img.src = data;
+  }
+
+  get #usernameOrInitials() {
+    if (!this.username) return "??";
+    return this.username.length < this.clientWidth * 2
+      ? this.username
+      : this.username
+          .split(" ")
+          .map((n) => n[0])
+          .join("");
   }
 }
 

@@ -74,10 +74,7 @@ class VideoSource extends LitElement {
       }
 
       &:not(:empty) {
-        grid-area: video;
-        justify-self: start;
-        align-self: end;
-        padding: clamp(0.25rem, 2.5vmin, 0.5rem) clamp(0.5rem, 2.5vmin, 1rem);
+        padding: clamp(0.25rem, 0.5vmin, 0.5rem) clamp(0.75rem, 1vmin, 1rem);
         background-color: #17e;
         color: #fff;
         border-radius: 0 0.5rem 0 0;
@@ -132,7 +129,7 @@ class VideoSource extends LitElement {
               Stream
             </button>`}
       </span>
-      <span class="username">${UserState.me?.username}</span>
+      <span class="username">${this.#usernameOrInitials}</span>
     `;
   }
 
@@ -190,6 +187,17 @@ class VideoSource extends LitElement {
       video.requestVideoFrameCallback(() =>
         this.#processVideoFrame(video, snapshotCanvas, width, height)
       );
+  }
+
+  get #usernameOrInitials() {
+    const { username } = UserState.me;
+    if (!username) return "??";
+    return username.length < this.clientWidth * 2
+      ? username
+      : username
+          .split(" ")
+          .map((n) => n[0])
+          .join("");
   }
 }
 
